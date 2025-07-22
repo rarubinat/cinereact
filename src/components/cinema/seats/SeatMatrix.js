@@ -2,11 +2,6 @@ import React, { useState, useEffect } from "react";
 import Seat from "./Seat";
 import '../../styles/Seat.css';
 
-const normalizeDate = (dateStr) => {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return d.toISOString().split('T')[0];
-};
 
 // Función que genera una fila de asientos
 const GenerateSeats = (seatNumbers, onSeatSelected, selectedMovie, selectedTime, selectedDate) => (

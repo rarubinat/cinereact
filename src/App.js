@@ -1,14 +1,14 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import ViewReserve from "./components/profile/ViewReserve";
 import EditProfile from "./components/profile/EditProfile";
+
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 
 import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/NavBar";
-import Home from "./components/layout/Home";
+import Home from "./Home";
 
 import MovieDetails from "./components/layout/MovieDetails";
 import ReserveMovie from "./components/layout/ReserveMovie";
@@ -27,7 +27,7 @@ const App = () => {
             <Route path="/home" element={<Home />} />
 
             <Route path="/movie/:title" element={<MovieDetails />} />
-            <Route path="/reserveMovie" element={<ReserveMovie />} />
+            <Route path="/reservemovie" element={<ReserveMovie />} />
 
             <Route path="/view-reservations" element={<ViewReserve />} />
             <Route path="/edit-profile" element={<EditProfile />} />

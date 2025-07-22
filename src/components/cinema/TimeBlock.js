@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import MovieContext from '../../contexts/MovieContext';
-import '../styles/TimeBlock.css';
 
 const TimeBlock = ({ selectedTime, handleTimeChange }) => {
   const { movies } = useContext(MovieContext);

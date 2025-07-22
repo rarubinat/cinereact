@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import moviesData from "../../data/moviesData";
 import DateBlock from "../../components/cinema/DateBlock";
-import TimeBlock from "../../components/cinema/TimeBlock";
+
 
 const MovieDetails = () => {
   const { title } = useParams();

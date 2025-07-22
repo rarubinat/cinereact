@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import moviesData from "../../data/moviesData";
 import SeatMatrix from "../../components/cinema/seats/SeatMatrix";
