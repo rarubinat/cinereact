@@ -1,0 +1,32 @@
+.time-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 50px;
+}
+
+.time-button {
+  padding: 12px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 1.1px;
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+  user-select: none;
+  min-width: 90px;
+  text-align: center;
+}
+
+
+.time-button.selected {
+  color: #f0f0f0; /* blanco */
+  font-weight: 700;
+  transform: translateY(-2px);
+}
