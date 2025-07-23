@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import db from '../../../utils/firebase';
-import '../../styles/Seat.css';
 
-// Función para normalizar fecha
 const normalizeDate = (dateStr) => {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -13,16 +11,13 @@ const Seat = ({ seatno, onSeatSelected, selectedMovie, selectedTime, selectedDat
   const [isSelected, setIsSelected] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
 
-  // Manejo de selección de asiento
   const seatClickHandler = () => {
-    if (isRegistered) return; // No permitir clic si está ocupado
-
+    if (isRegistered) return;
     const newState = !isSelected;
     setIsSelected(newState);
     onSeatSelected(newState, seatno);
   };
 
-  // Verificar si el asiento está registrado en Firebase
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -33,7 +28,6 @@ const Seat = ({ seatno, onSeatSelected, selectedMovie, selectedTime, selectedDat
           .where('selectedTime', '==', selectedTime)
           .where('selectedDate', '==', normalizedDate)
           .get();
-
         setIsRegistered(!snapshot.empty);
       } catch (error) {
         console.error('Error al verificar el asiento registrado:', error);
@@ -42,18 +36,20 @@ const Seat = ({ seatno, onSeatSelected, selectedMovie, selectedTime, selectedDat
     fetchData();
   }, [seatno, selectedMovie, selectedTime, selectedDate]);
 
-  // Clases CSS basadas en estado
-  const seatStatus = isSelected ? 'seat-blue' : isRegistered ? 'seat-red' : 'seat-grey';
-  const seatStyle = isRegistered ? { pointerEvents: 'none' } : {};
+  const seatClasses = `
+    flex items-center justify-center rounded-t-full
+    text-[10px] sm:text-xs font-bold shadow-md
+    w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 
+    transition-transform duration-200
+    ${isRegistered ? 'bg-red-700 opacity-70 cursor-not-allowed' :
+      isSelected ? 'bg-blue-600 text-white scale-110' :
+      'bg-gray-400 hover:bg-blue-400 hover:scale-105 cursor-pointer'}
+  `;
 
   return (
-    <div className="col-2 col-md-2">
-      <div
-        className={`seat seat-${seatno} ${seatStatus}`}
-        onClick={seatClickHandler}
-        style={seatStyle}
-      >
-        {isSelected && `${seatno}`}
+    <div className="p-1">
+      <div className={seatClasses} onClick={seatClickHandler} style={isRegistered ? { pointerEvents: 'none' } : {}}>
+        {isSelected && seatno}
       </div>
     </div>
   );

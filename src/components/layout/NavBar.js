@@ -29,7 +29,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link
-          to="/home"
+          to="/films"
           onClick={closeMenu}
           className="text-xl md:text-2xl font-light tracking-widest text-blue-400 cursor-pointer uppercase"
         >
@@ -39,7 +39,7 @@ const Navbar = () => {
         {/* Desktop Nav */}
         <ul className="hidden md:flex space-x-10 text-sm font-light tracking-wide">
           <li>
-            <Link to="/home" className="hover:text-blue-400 transition-colors">Films</Link>
+            <Link to="/films" className="hover:text-blue-400 transition-colors">Films</Link>
           </li>
           <li>
             <Link to="/view-reservations" className="hover:text-blue-400 transition-colors">My Bookings</Link>
@@ -75,7 +75,7 @@ const Navbar = () => {
       {/* Menú móvil */}
       {menuOpen && (
         <ul className="md:hidden bg-zinc-950 px-6 pb-4 pt-2 space-y-4 text-sm font-light tracking-wide border-t border-blue-500/10">
-          <li><Link to="/home" onClick={closeMenu} className="hover:text-blue-400">Films</Link></li>
+          <li><Link to="/films" onClick={closeMenu} className="hover:text-blue-400">Films</Link></li>
           <li><Link to="/view-reservations" onClick={closeMenu} className="hover:text-blue-400">My Bookings</Link></li>
           <li><Link to="/edit-profile" onClick={closeMenu} className="hover:text-blue-400">Profile</Link></li>
           <li>

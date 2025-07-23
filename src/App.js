@@ -10,7 +10,8 @@ import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/NavBar";
 import Home from "./Home";
 
-import MovieDetails from "./components/layout/MovieDetails";
+import Films from "./Films";
+import MovieDetails from "./components/cinema/MovieDetails";
 import ReserveMovie from "./components/layout/ReserveMovie";
 
 
@@ -21,10 +22,10 @@ const App = () => {
         <Navbar />
         <main className="flex-grow px-6 py-8">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Films />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/home" element={<Home />} />
+            <Route path="/films" element={<Films />} />
 
             <Route path="/movie/:title" element={<MovieDetails />} />
             <Route path="/reservemovie" element={<ReserveMovie />} />
