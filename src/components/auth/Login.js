@@ -1,78 +1,84 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import '../styles/App.css';
-import { auth } from "../../utils/firebase"; // Importa la autenticación de Firebase
-import db from "../../utils/firebase"; // Importa Firestore para consultar usuarios
+import { auth } from "../../utils/firebase";
+import db from "../../utils/firebase";
 
-const Login = ({ setPage }) => {
-  // Estado para almacenar el email, con valor predefinido
+const Login = () => {
   const [email, setEmail] = useState("alrubinat@gmail.com");
-  // Estado para almacenar la contraseña, con valor predefinido
   const [password, setPassword] = useState("123456");
-  // Estado para manejar mensajes de error y mostrarlos al usuario
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const navigate = useNavigate();
 
-  // Función que se ejecuta al hacer click en el botón "Entrar"
   const handleLogin = async () => {
-    setError(""); // Limpiar errores previos
+    setError("");
+    setSuccessMsg("");
 
     try {
-      // Intentar hacer login con el email y contraseña usando Firebase Auth
       const userCredential = await auth.signInWithEmailAndPassword(email, password);
-      const user = userCredential.user; // Obtener el usuario autenticado
+      const user = userCredential.user;
 
-      // Consultar Firestore para verificar si existe un documento con el uid del usuario
       const doc = await db.collection("users").doc(user.uid).get();
       if (!doc.exists) {
-        // Si no existe el documento, mostrar error y cerrar sesión
         setError("Tu cuenta no está habilitada para iniciar sesión.");
-        await auth.signOut(); // Cierra sesión si el usuario no está registrado en Firestore
-        return; // Salir de la función para que no continúe
+        await auth.signOut();
+        return;
       }
 
-      // Si todo está OK, mostrar alerta y cambiar de página
-      alert("Login exitoso");
-      setPage("ViewReservations"); // Cambia la vista a la página de reservas
+      setSuccessMsg("Login exitoso");
+      setTimeout(() => {
+        navigate("/films");
+      }, 1500); // espera 1.5 seg para mostrar mensaje
     } catch (err) {
-      // Captura errores específicos y muestra mensajes personalizados
       let message = "Usuario o contraseña incorrectos";
       if (err.code === "auth/user-not-found") message = "El usuario no existe";
       else if (err.code === "auth/wrong-password") message = "Contraseña incorrecta";
       else if (err.code === "auth/invalid-email") message = "Correo inválido";
 
-      setError(message); // Actualiza el estado de error para mostrarlo en la UI
+      setError(message);
     }
   };
 
   return (
-    <div className="home-page-wrapper">
+    <div className="home-page-wrapper data-modal-toggle">
       <div className="home-page">
         <h2>Login</h2>
-        {/* Input para el correo electrónico */}
+
+        {successMsg && (
+          <div className="mb-4 p-3 rounded bg-green-600 text-white font-semibold">
+            {successMsg}
+          </div>
+        )}
+
         <input
           type="email"
           placeholder="Correo electrónico"
           value={email}
-          onChange={(e) => setEmail(e.target.value)} // Actualiza el estado email al escribir
+          onChange={(e) => setEmail(e.target.value)}
+          className="mb-2 p-2 border rounded w-full"
         />
-        <br />
-        {/* Input para la contraseña */}
         <input
           type="password"
           placeholder="Contraseña"
           value={password}
-          onChange={(e) => setPassword(e.target.value)} // Actualiza el estado password al escribir
+          onChange={(e) => setPassword(e.target.value)}
+          className="mb-2 p-2 border rounded w-full"
         />
-        <br />
-        {/* Botón para iniciar sesión */}
-        <button onClick={handleLogin}>Entrar</button>
-        {/* Mostrar mensaje de error si existe */}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <p>
+        <button
+          onClick={handleLogin}
+          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+        >
+          Entrar
+        </button>
+
+        {error && <p className="text-red-600 mt-2">{error}</p>}
+
+        <p className="mt-4">
           ¿No tienes cuenta?{" "}
-          {/* Enlace para cambiar a la página de registro */}
           <span
-            onClick={() => setPage("Register")}
-            style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+            onClick={() => navigate("/register")}
+            className="text-blue-600 cursor-pointer underline"
           >
             Regístrate
           </span>

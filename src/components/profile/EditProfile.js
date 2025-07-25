@@ -14,48 +14,42 @@ const EditProfile = ({ setPage }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Traer los datos del usuario actual
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const user = auth.currentUser;
-        if (!user) {
-          setError("No estás autenticado");
-          setLoading(false);
-          return;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const userDoc = await db.collection("users").doc(user.uid).get();
+          if (userDoc.exists) {
+            const data = userDoc.data();
+            setForm({
+              name: data.name || "",
+              phone: data.phone || "",
+              birthdate: data.birthdate && data.birthdate.toDate
+                ? data.birthdate.toDate().toISOString().slice(0, 10)
+                : "",
+              gender: data.gender || "",
+            });
+            setError("");
+          } else {
+            setError("No se encontró el perfil del usuario.");
+          }
+        } catch {
+          setError("Error al cargar datos.");
         }
-
-        const userDoc = await db.collection("users").doc(user.uid).get();
-        if (userDoc.exists) {
-          const data = userDoc.data();
-          setForm({
-            name: data.name || "",
-            phone: data.phone || "",
-            birthdate: data.birthdate ? data.birthdate.toDate().toISOString().slice(0, 10) : "",
-            gender: data.gender || "",
-          });
-        } else {
-          setError("No se encontró el perfil del usuario.");
-        }
-      } catch (err) {
-        setError("Error al cargar datos.");
+      } else {
+        setError("No estás autenticado");
       }
       setLoading(false);
-    };
+    });
 
-    fetchUserData();
+    return () => unsubscribe();
   }, []);
 
-  // Manejar cambios en inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  // Guardar cambios en Firestore
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -66,8 +60,6 @@ const EditProfile = ({ setPage }) => {
         setError("No estás autenticado");
         return;
       }
-
-      // Validación simple (opcional)
       if (!form.name.trim()) {
         setError("El nombre no puede estar vacío.");
         return;
@@ -82,63 +74,82 @@ const EditProfile = ({ setPage }) => {
       });
 
       alert("Perfil actualizado correctamente.");
-      setPage("Profile"); // O donde quieras que vaya después
+      setPage("Profile");
     } catch (err) {
       setError("Error al actualizar el perfil.");
       console.error(err);
     }
   };
 
-  if (loading) return <p>Cargando datos...</p>;
+  if (loading) return <p className="text-center mt-10">Cargando datos...</p>;
 
   return (
-    <div style={{ maxWidth: "400px", margin: "0 auto", textAlign: "center" }}>
-      <h2>Editar Perfil</h2>
+    <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md mt-10">
+      <h2 className="text-2xl font-semibold mb-6 text-center">Editar Perfil</h2>
 
-      <form onSubmit={handleSubmit}>
-        <label>Nombre completo</label><br />
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        /><br />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block mb-1 font-medium">Nombre completo</label>
+          <input
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
-        <label>Teléfono (opcional)</label><br />
-        <input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          pattern="\d*"
-          placeholder="Solo números"
-        /><br />
+        <div>
+          <label className="block mb-1 font-medium">Teléfono (opcional)</label>
+          <input
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            pattern="\d*"
+            placeholder="Solo números"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
-        <label>Fecha de nacimiento</label><br />
-        <input
-          type="date"
-          name="birthdate"
-          value={form.birthdate}
-          onChange={handleChange}
-          required
-        /><br />
+        <div>
+          <label className="block mb-1 font-medium">Fecha de nacimiento</label>
+          <input
+            type="date"
+            name="birthdate"
+            value={form.birthdate}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
-        <label>Género</label><br />
-        <select name="gender" value={form.gender} onChange={handleChange}>
-          <option value="">Seleccione género</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Femenino">Femenino</option>
-          <option value="Otro">Otro</option>
-          <option value="Prefiero no decir">Prefiero no decir</option>
-        </select><br /><br />
+        <div>
+          <label className="block mb-1 font-medium">Género</label>
+          <select
+            name="gender"
+            value={form.gender}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">Seleccione género</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decir">Prefiero no decir</option>
+          </select>
+        </div>
 
-        <button type="submit">Guardar Cambios</button>
+        {error && <p className="text-red-600 text-center">{error}</p>}
+
+        <div className="flex justify-between items-center">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Guardar Cambios
+          </button>
+        </div>
       </form>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <button onClick={() => setPage("Profile")} style={{ marginTop: "10px" }}>
-        Cancelar
-      </button>
     </div>
   );
 };

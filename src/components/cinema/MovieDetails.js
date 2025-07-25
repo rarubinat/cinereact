@@ -3,14 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import moviesData from "../../data/moviesData";
 import DateBlock from "../cinema/blocks/DateBlock";
 
-
 const MovieDetails = () => {
   const { title } = useParams();
-  const navigate = useNavigate(); // <-- aquí
+  const navigate = useNavigate();
   const movie = moviesData[decodeURIComponent(title)];
 
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [alert, setAlert] = useState({ message: "", visible: false });
+
+  const showAlert = (message) => {
+    setAlert({ message, visible: true });
+    setTimeout(() => setAlert({ message: "", visible: false }), 3000);
+  };
 
   if (!movie) {
     return (
@@ -22,8 +27,45 @@ const MovieDetails = () => {
 
   const showtimesForDate = selectedDate ? movie.showtimes : [];
 
+  const handleReserve = () => {
+    if (!selectedDate || !selectedTime) {
+      showAlert("Selecciona una fecha y hora antes de continuar.");
+      return;
+    }
+
+    navigate("/reserveMovie", {
+      state: {
+        selectedMovie: decodeURIComponent(title),
+        selectedDate,
+        selectedTime,
+      },
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-zinc-900 text-white p-8 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-zinc-900 text-white p-8 max-w-6xl mx-auto relative">
+      {/* Alerta estilizada */}
+      {alert.visible && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-50">
+          <div className="flex items-center gap-3 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-xl border border-blue-400 animate-fade-in">
+            <svg
+              className="w-6 h-6 text-white shrink-0"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="text-sm font-medium">{alert.message}</span>
+          </div>
+        </div>
+      )}
+
       <h1 className="text-5xl font-extrabold text-blue-500 mb-10 tracking-wide">
         {title}
       </h1>
@@ -82,26 +124,19 @@ const MovieDetails = () => {
                 Has seleccionado: <strong>{selectedDate}</strong> a las{" "}
                 <strong>{selectedTime}</strong>
               </p>
-              <p>Sala: {movie.showtimes.find((s) => s.time === selectedTime)?.room}</p>
+              <p>
+                Sala:{" "}
+                {movie.showtimes.find((s) => s.time === selectedTime)?.room}
+              </p>
             </div>
           )}
 
-          {selectedDate && selectedTime && (
-            <button
-              className="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-semibold"
-              onClick={() => {
-                navigate("/reserveMovie", {
-                  state: {
-                    selectedMovie: decodeURIComponent(title),
-                    selectedDate,
-                    selectedTime,
-                  },
-                });
-              }}
-            >
-              Reservar ahora
-            </button>
-          )}
+          <button
+            className="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-semibold disabled:opacity-50"
+            onClick={handleReserve}
+          >
+            Reservar ahora
+          </button>
         </div>
       </div>
     </div>

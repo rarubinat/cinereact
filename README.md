@@ -56,6 +56,8 @@ firebase deploy
 
 ## 📅 Update History
 
+**2025-07-25**: Login Modal integration.
+
 **2025-07-10**: Improve overall CSS, integrate folder structure for ongoing app development, pre-release login/register, and user integration.
 
 
