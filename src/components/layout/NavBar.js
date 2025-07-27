@@ -27,7 +27,7 @@ const Navbar = ({ onLoginClick }) => {
     <nav className="bg-zinc-950 text-white w-full border-b border-blue-500/20 shadow-inner shadow-blue-500/10">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link
-          to="/films"
+          to="/home"
           onClick={closeMenu}
           className="text-xl md:text-2xl font-light tracking-widest text-blue-400 cursor-pointer uppercase"
         >
