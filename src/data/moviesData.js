@@ -1,30 +1,30 @@
 const moviesData = { 
-  "Spider-Man: Cruzando el Multiverso": {
+  "Spider-Man: Across the Spider-Verse": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Spider-Man__Cruzando_el_Multiverso.avif?alt=media&token=f4fa147a-a1cf-4b53-9e28-13226c5fe929",
-    sinopsis: "Miles Morales se une a Gwen Stacy y a un equipo de Spider-Personas para enfrentar una amenaza que podría destruir todos los universos. Mientras lucha por salvar a quienes ama, Miles se enfrenta a un dilema que lo obliga a redefinir lo que significa ser un héroe.",
+    synopsis: "Miles Morales teams up with Gwen Stacy and a group of Spider-People to face a threat that could destroy all universes. As he fights to save his loved ones, Miles faces a dilemma that forces him to redefine what it means to be a hero.",
     duration: 140,
     releaseDate: "2023-06-02",
-    genre: "Animación, Acción, Aventura",
+    genre: "Animation, Action, Adventure",
     directors: ["Joaquim Dos Santos", "Kemp Powers", "Justin K. Thompson"],
     writers: ["Phil Lord", "Christopher Miller", "David Callaham"],
-    rating: "Apta para todos los públicos",
+    rating: "Rated G (General audiences)",
     showtimes: [
       { time: "10:00 AM", room: "12" },
       { time: "2:00 PM", room: "2" },
       { time: "6:00 PM", room: "5" }
     ]
   },
-  "Insidious: La puerta roja": {
+  "Insidious: The Red Door": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Insidious__La_Puerta_Roja.avif?alt=media&token=ba158c51-7e50-4f5e-8557-c2165dec3c73",
-    sinopsis: "Josh y Dalton regresan al mundo espiritual para enfrentar los oscuros secretos que han perseguido a su familia durante años. En su viaje final hacia 'El Más Allá', deben cerrar la puerta roja y acabar con la maldición que amenaza con destruirlos para siempre.",
+    synopsis: "Josh and Dalton return to the spiritual realm to confront the dark secrets that have haunted their family for years. In their final journey into 'The Further,' they must close the red door and end the curse that threatens to destroy them forever.",
     duration: 107,
     releaseDate: "2023-07-07",
-    genre: "Terror, Misterio, Thriller",
+    genre: "Horror, Mystery, Thriller",
     directors: ["Patrick Wilson"],
     writers: ["Leigh Whannell", "Scott Teems"],
-    rating: "No apta para todos los públicos",
+    rating: "Rated R (Restricted)",
     showtimes: [
       { time: "10:00 AM", room: "7" },
       { time: "2:00 PM", room: "2" }
@@ -33,13 +33,13 @@ const moviesData = {
   "Oppenheimer": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Oppenheimer.avif?alt=media&token=6562e420-10d0-4611-a948-86455c366c4f",
-    sinopsis: "Biografía de J. Robert Oppenheimer, el físico detrás del desarrollo de la bomba atómica. La película explora su papel en el Proyecto Manhattan y el dilema moral que enfrentó tras desatar un arma capaz de cambiar la historia de la humanidad.",
+    synopsis: "Biography of J. Robert Oppenheimer, the physicist behind the development of the atomic bomb. The film explores his role in the Manhattan Project and the moral dilemma he faced after unleashing a weapon capable of changing the course of human history.",
     duration: 180,
     releaseDate: "2023-07-21",
-    genre: "Drama, Historia, Biografía",
+    genre: "Drama, History, Biography",
     directors: ["Christopher Nolan"],
     writers: ["Christopher Nolan", "Kai Bird", "Martin J. Sherwin"],
-    rating: "No apta para todos los públicos",
+    rating: "Rated R (Restricted)",
     showtimes: [
       { time: "10:00 AM", room: "1" },
       { time: "2:00 PM", room: "2" },
@@ -49,45 +49,45 @@ const moviesData = {
   "Barbie": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Barbie.avif?alt=media&token=ae8474ce-d473-4d8d-bea9-4ade11565265",
-    sinopsis: "Barbie vive en Barbieland, un mundo perfecto... hasta que empieza a cuestionarse su realidad. Decidida a descubrir la verdad sobre el mundo y sobre sí misma, se aventura al mundo real en una divertida y reflexiva odisea sobre la identidad y la autoaceptación.",
+    synopsis: "Barbie lives in Barbieland, a perfect world... until she starts questioning her reality. Determined to discover the truth about the world and herself, she ventures into the real world on a fun and reflective journey about identity and self-acceptance.",
     duration: 114,
     releaseDate: "2023-07-21",
-    genre: "Comedia, Aventura, Fantasía",
+    genre: "Comedy, Adventure, Fantasy",
     directors: ["Greta Gerwig"],
     writers: ["Greta Gerwig", "Noah Baumbach"],
-    rating: "Apta para todos los públicos",
+    rating: "Rated G (General audiences)",
     showtimes: [
-      { time: "10:00 AM", room: "Sala 1" },
+      { time: "10:00 AM", room: "1" },
       { time: "2:00 PM", room: "2" },
       { time: "6:00 PM", room: "3" }
     ]
   },
-  "Super Mario Bross: La película": {
+  "The Super Mario Bros. Movie": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Super_Mario_Bros._La_Pel%C3%ADcula.avif?alt=media&token=bf162e79-7a0e-4e53-b658-4f5e50972a14",
-    sinopsis: "Mario y Luigi, dos hermanos fontaneros de Brooklyn, son transportados al Reino Champiñón. Allí, unen fuerzas con la Princesa Peach y Toad para enfrentar al malvado Bowser y rescatar al reino de su dominio. Una aventura épica con acción y nostalgia.",
+    synopsis: "Mario and Luigi, two plumber brothers from Brooklyn, are transported to the Mushroom Kingdom. There, they team up with Princess Peach and Toad to face the evil Bowser and save the kingdom from his rule. An epic adventure filled with action and nostalgia.",
     duration: 92,
     releaseDate: "2023-04-05",
-    genre: "Animación, Aventura, Comedia",
+    genre: "Animation, Adventure, Comedy",
     directors: ["Aaron Horvath", "Michael Jelenic"],
     writers: ["Matthew Fogel"],
-    rating: "Apta para todos los públicos",
+    rating: "Rated G (General audiences)",
     showtimes: [
       { time: "10:00 AM", room: "1" },
       { time: "2:00 PM", room: "2" },
       { time: "6:00 PM", room: "13" }
     ]
   },
-  "Transformers: El despertar de las bestias": {
+  "Transformers: Rise of the Beasts": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Transformers__El_Despertar_de_las_Bestias.avif?alt=media&token=e27ce527-04b4-463d-8eff-75f856c7e16f",
-    sinopsis: "Los Autobots y los nuevos aliados Maximals se enfrentan a una amenaza ancestral que podría destruir la Tierra. En esta nueva entrega, humanos y robots deben unir fuerzas para salvar el planeta de una guerra intergaláctica inminente.",
+    synopsis: "The Autobots and their new allies, the Maximals, face an ancient threat that could destroy Earth. In this new installment, humans and robots must join forces to save the planet from an imminent intergalactic war.",
     duration: 127,
     releaseDate: "2023-06-09",
-    genre: "Acción, Ciencia ficción, Aventura",
+    genre: "Action, Science Fiction, Adventure",
     directors: ["Steven Caple Jr."],
     writers: ["Joby Harold", "Darnell Metayer", "Josh Peters"],
-    rating: "No apta para todos los públicos",
+    rating: "Rated R (Restricted)",
     showtimes: [
       { time: "10:00 AM", room: "7" },
       { time: "2:00 PM", room: "2" }
@@ -96,13 +96,13 @@ const moviesData = {
   "Gran Turismo": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Gran_Turismo.avif?alt=media&token=c4da5eb9-8362-4d2a-8154-992a4c3acedf",
-    sinopsis: "Basada en una historia real, un joven jugador experto en el videojuego Gran Turismo es reclutado para competir como piloto profesional. Su talento, pasión y perseverancia lo llevarán de la pantalla a las pistas, enfrentando grandes desafíos y riesgos reales.",
+    synopsis: "Based on a true story, a young gamer skilled in Gran Turismo is recruited to compete as a professional driver. His talent, passion, and perseverance take him from the screen to the track, facing great challenges and real dangers.",
     duration: 135,
     releaseDate: "2023-08-25",
-    genre: "Acción, Drama, Deporte",
+    genre: "Action, Drama, Sport",
     directors: ["Neill Blomkamp"],
     writers: ["Jason Hall", "Zach Baylin"],
-    rating: "No apta para todos los públicos",
+    rating: "Rated R (Restricted)",
     showtimes: [
       { time: "10:00 AM", room: "1" },
       { time: "2:00 PM", room: "2" },
@@ -112,13 +112,13 @@ const moviesData = {
   "Fast & Furious X": {
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Fast_%26_Furious_X.avif?alt=media&token=4ab6659d-6c97-4491-8983-370c19360a83",
-    sinopsis: "Dom Toretto enfrenta su desafío más personal cuando un enemigo del pasado regresa buscando venganza. Con su familia en la mira, Dom deberá usar todas sus habilidades y lealtades para protegerlos en una carrera contrarreloj llena de acción, velocidad y traición.",
+    synopsis: "Dom Toretto faces his most personal challenge yet when an enemy from the past returns seeking revenge. With his family in the crosshairs, Dom must use all his skills and loyalties to protect them in a race against time filled with action, speed, and betrayal.",
     duration: 141,
     releaseDate: "2023-05-19",
-    genre: "Acción, Crimen, Thriller",
+    genre: "Action, Crime, Thriller",
     directors: ["Louis Leterrier"],
     writers: ["Dan Mazeau", "Justin Lin"],
-    rating: "No apta para todos los públicos",
+    rating: "Rated R (Restricted)",
     showtimes: [
       { time: "10:00 AM", room: "1" },
       { time: "2:00 PM", room: "25" },

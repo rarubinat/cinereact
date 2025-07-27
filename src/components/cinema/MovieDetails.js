@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"; 
 import { useParams, useNavigate } from "react-router-dom";
 import moviesData from "../../data/moviesData";
 import DateBlock from "../cinema/blocks/DateBlock";
@@ -20,7 +20,7 @@ const MovieDetails = () => {
   if (!movie) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-zinc-950 text-white p-6">
-        <p className="text-xl">Película no encontrada.</p>
+        <p className="text-xl">Movie not found.</p>
       </div>
     );
   }
@@ -29,7 +29,7 @@ const MovieDetails = () => {
 
   const handleReserve = () => {
     if (!selectedDate || !selectedTime) {
-      showAlert("Selecciona una fecha y hora antes de continuar.");
+      showAlert("Please select a date and time before continuing.");
       return;
     }
 
@@ -44,7 +44,7 @@ const MovieDetails = () => {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white p-8 max-w-6xl mx-auto relative">
-      {/* Alerta estilizada */}
+      {/* Styled alert */}
       {alert.visible && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-50">
           <div className="flex items-center gap-3 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-xl border border-blue-400 animate-fade-in">
@@ -95,7 +95,7 @@ const MovieDetails = () => {
           {selectedDate && (
             <div className="my-6">
               <h2 className="text-3xl font-bold mb-4 text-blue-500">
-                Salas y Horarios para {selectedDate}
+                Rooms and Showtimes for {selectedDate}
               </h2>
               <div className="flex flex-wrap gap-4">
                 {showtimesForDate.length > 0 ? (
@@ -107,12 +107,12 @@ const MovieDetails = () => {
                       }`}
                       onClick={() => setSelectedTime(time)}
                     >
-                      <p className="text-white font-semibold">Sala {room}</p>
+                      <p className="text-white font-semibold">Room {room}</p>
                       <p className="text-blue-300">{time}</p>
                     </div>
                   ))
                 ) : (
-                  <p>No hay horarios disponibles para esta fecha.</p>
+                  <p>No showtimes available for this date.</p>
                 )}
               </div>
             </div>
@@ -121,11 +121,11 @@ const MovieDetails = () => {
           {selectedDate && selectedTime && (
             <div className="mt-4 p-4 bg-blue-800 rounded text-white">
               <p>
-                Has seleccionado: <strong>{selectedDate}</strong> a las{" "}
+                Selected: <strong>{selectedDate}</strong> at{" "}
                 <strong>{selectedTime}</strong>
               </p>
               <p>
-                Sala:{" "}
+                Room:{" "}
                 {movie.showtimes.find((s) => s.time === selectedTime)?.room}
               </p>
             </div>
@@ -135,7 +135,7 @@ const MovieDetails = () => {
             className="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-semibold disabled:opacity-50"
             onClick={handleReserve}
           >
-            Reservar ahora
+            Reserve
           </button>
         </div>
       </div>

@@ -83,7 +83,7 @@ const ReserveMovie = () => {
   if (!movie) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-zinc-950 text-white p-6">
-        <p className="text-xl">Película no encontrada.</p>
+        <p className="text-xl">Not found.</p>
       </div>
     );
   }
@@ -118,22 +118,22 @@ const ReserveMovie = () => {
 
       <div className="bg-blue-800 bg-opacity-40 rounded-lg p-6 mb-10">
         <p className="text-lg">
-          <strong>Película:</strong> {selectedMovie}
+          <strong>Film:</strong> {selectedMovie}
         </p>
         <p className="text-lg">
-          <strong>Fecha:</strong> {selectedDate}
+          <strong>Date:</strong> {selectedDate}
         </p>
         <p className="text-lg">
-          <strong>Hora:</strong> {selectedTime}
+          <strong>Time:</strong> {selectedTime}
         </p>
         <p className="text-lg">
-          <strong>Sala:</strong> {room || "No definida"}
+          <strong>Room:</strong> {room || "No definida"}
         </p>
       </div>
 
       <div className="mt-8">
         <h2 className="text-3xl font-bold mb-4 text-blue-500">
-          Selecciona tus Asientos
+          Select your seats
         </h2>
         <SeatMatrix
           onSeatSelection={handleSeatSelection}
@@ -148,11 +148,11 @@ const ReserveMovie = () => {
       {selectedSeats.length > 0 && (
         <div className="mt-10 bg-blue-700 bg-opacity-30 rounded p-6">
           <p className="text-lg mb-2">
-            <strong>Asientos seleccionados:</strong>{" "}
+            <strong>Seats selected:</strong>{" "}
             {selectedSeats.join(", ")}
           </p>
           <p className="text-lg mb-6">
-            <strong>Total a pagar:</strong> {totalPrice.toFixed(2)} €
+            <strong>Price:</strong> {totalPrice.toFixed(2)} €
           </p>
           <button
             onClick={handleSaveReservation}
@@ -163,7 +163,7 @@ const ReserveMovie = () => {
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
-            {loading ? "Guardando..." : "Guardar Reserva"}
+            {loading ? "Saving..." : "Save Reservation"}
           </button>
         </div>
       )}

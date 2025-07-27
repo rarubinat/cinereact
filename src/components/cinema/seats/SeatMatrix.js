@@ -64,7 +64,7 @@ const SeatMatrix = ({ onSeatSelection, selectedMovie, selectedTime, selectedDate
       </div>
 
       <div className="bg-gray-600 text-white text-center font-semibold rounded-md py-2 shadow-md max-w-md mx-auto mb-4 tracking-widest">
-        Pantalla
+        screen
       </div>
 
     

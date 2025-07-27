@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ArrowUp } from "lucide-react";
 
 import ViewReserve from "./components/profile/ViewReserve";
 import EditProfile from "./components/profile/EditProfile";
@@ -25,21 +26,15 @@ const App = () => {
     }
   };
 
-  // Mostrar botón cuando el scroll pasa de 200px
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
+      setShowScrollTop(window.scrollY > 200);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Función para subir al inicio
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -64,14 +59,14 @@ const App = () => {
 
         <Footer />
 
-        {/* Botón Scroll to Top */}
+        {/* Botón Scroll to Top Mejorado */}
         {showScrollTop && (
           <button
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition z-50"
+            className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white p-3 rounded-lg shadow-lg transition transform hover:scale-110 z-50"
             aria-label="Subir"
           >
-            ↑
+            <ArrowUp className="w-6 h-6 animate-bounce" />
           </button>
         )}
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import db, { auth } from "../../utils/firebase";
 import moviesData from "../../data/moviesData";
 
@@ -11,6 +11,7 @@ const ViewReserve = ({ setPage }) => {
     reservationId: null,
   });
 
+  // Mostrar alerta temporal
   const showAlert = (message) => {
     setAlert({ message, visible: true });
     setTimeout(() => {
@@ -18,7 +19,8 @@ const ViewReserve = ({ setPage }) => {
     }, 3000);
   };
 
-  const fetchReservations = async () => {
+  // Obtener reservas del usuario autenticado
+  const fetchReservations = useCallback(async () => {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
@@ -32,27 +34,22 @@ const ViewReserve = ({ setPage }) => {
         .where("userId", "==", currentUser.uid)
         .get();
 
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
-      });
+      const data = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
       data.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
 
       setReservations(data);
-      if (data.length > 0) {
-        setFirstReservationId(data[0].id);
-      }
+      if (data.length > 0) setFirstReservationId(data[0].id);
     } catch (error) {
       console.error("Error al obtener las reservas:", error);
       showAlert("No se pudieron obtener las reservas.");
     }
-  };
+  }, []);
 
-  const handleCancelReservation = (id) => {
-    setConfirmModal({ visible: true, reservationId: id });
-  };
-
+  // Cancelar reserva
   const confirmCancel = async () => {
     const id = confirmModal.reservationId;
     try {
@@ -70,13 +67,14 @@ const ViewReserve = ({ setPage }) => {
     }
   };
 
+  // Cargar reservas al montar el componente
   useEffect(() => {
     fetchReservations();
-  }, []);
+  }, [fetchReservations]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white px-6 py-10 relative">
-      {/* Alerta azul estilizada */}
+      {/* Alerta azul */}
       {alert.visible && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-50">
           <div className="flex items-center gap-3 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-xl border border-blue-400 animate-fade-in">
@@ -98,22 +96,19 @@ const ViewReserve = ({ setPage }) => {
         </div>
       )}
 
-      {/* Modal azul de confirmación */}
+      {/* Modal de confirmación */}
       {confirmModal.visible && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-blue-900 rounded-xl p-6 max-w-sm w-full text-white shadow-xl border border-blue-700 animate-fade-in">
             <h3 className="text-lg font-semibold text-blue-200 mb-3">
-              Cancelar reserva
+              Cancel Reserve
             </h3>
             <p className="text-sm text-blue-100 mb-6">
-              ¿Estás seguro que quieres cancelar esta reserva? Esta acción no se
-              puede deshacer.
+              ¿Estás seguro que quieres cancelar esta reserva? Esta acción no se puede deshacer.
             </p>
             <div className="flex justify-end gap-3">
               <button
-                onClick={() =>
-                  setConfirmModal({ visible: false, reservationId: null })
-                }
+                onClick={() => setConfirmModal({ visible: false, reservationId: null })}
                 className="px-4 py-2 text-sm rounded-md border border-blue-400 text-blue-200 hover:bg-blue-800 transition"
               >
                 Cancelar
@@ -129,15 +124,17 @@ const ViewReserve = ({ setPage }) => {
         </div>
       )}
 
+      {/* Título */}
       <h2 className="text-2xl font-light tracking-wide text-blue-400 mb-6 border-b border-blue-500/20 pb-2">
         Reservas Guardadas
       </h2>
 
+      {/* Lista de reservas */}
       {reservations.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {reservations.map((reservation) => {
-            const selectedMovieData = moviesData[reservation.selectedMovie];
-            const movieImage = selectedMovieData?.image;
+            const selectedMovieData = moviesData[reservation.selectedMovie] || {};
+            const movieImage = selectedMovieData.image || null;
 
             return (
               <div
@@ -163,19 +160,16 @@ const ViewReserve = ({ setPage }) => {
                     {reservation.selectedDate}, {reservation.selectedTime}
                   </p>
                   <p className="text-sm">
-                    <span className="text-zinc-400">Sala:</span>{" "}
-                    {reservation.room}
+                    <span className="text-zinc-400">Sala:</span> {reservation.room}
                   </p>
                   <p className="text-sm">
-                    <span className="text-zinc-400">Asientos:</span>{" "}
-                    {reservation.selectedSeats.join(", ")}
+                    <span className="text-zinc-400">Asientos:</span> {reservation.selectedSeats.join(", ")}
                   </p>
                   <p className="text-sm">
-                    <span className="text-zinc-400">Total:</span>{" "}
-                    {reservation.totalPrice} €
+                    <span className="text-zinc-400">Total:</span> {reservation.totalPrice} €
                   </p>
                   <button
-                    onClick={() => handleCancelReservation(reservation.id)}
+                    onClick={() => setConfirmModal({ visible: true, reservationId: reservation.id })}
                     className="mt-3 w-full text-sm bg-transparent border border-red-500 text-red-400 hover:bg-red-600 hover:text-white py-1.5 rounded-md transition"
                   >
                     Cancelar Reserva

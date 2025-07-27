@@ -5,31 +5,31 @@ const Footer = () => {
   return (
     <footer className="bg-[#002F6C] text-white text-sm py-8 px-6 w-full">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 border-b border-blue-800 pb-6">
-        {/* Logo/Descripción */}
+        {/* Logo/Description */}
         <div>
           <h3 className="font-semibold mb-4 text-[#00A1E4]">CINEMA</h3>
           <p className="text-blue-200">
-            Disfruta de la mejor experiencia cinematográfica con nosotros.
+            Enjoy the best cinematic experience with us.
           </p>
         </div>
 
-        {/* Enlaces */}
+        {/* Links */}
         <div>
-          <h4 className="font-semibold mb-4 text-[#00A1E4]">Información</h4>
+          <h4 className="font-semibold mb-4 text-[#00A1E4]">Information</h4>
           <ul className="space-y-2 text-blue-300">
             <li>
               <a href="#" className="hover:underline hover:text-[#00A1E4]">
-                Cartelera
+                Now Showing
               </a>
             </li>
             <li>
               <a href="#" className="hover:underline hover:text-[#00A1E4]">
-                Próximos estrenos
+                Coming Soon
               </a>
             </li>
             <li>
               <a href="#" className="hover:underline hover:text-[#00A1E4]">
-                Promociones
+                Promotions
               </a>
             </li>
             <li>
@@ -46,12 +46,12 @@ const Footer = () => {
           <ul className="space-y-2 text-blue-300">
             <li>
               <a href="#" className="hover:underline hover:text-[#00A1E4]">
-                Términos y condiciones
+                Terms & Conditions
               </a>
             </li>
             <li>
               <a href="#" className="hover:underline hover:text-[#00A1E4]">
-                Privacidad
+                Privacy Policy
               </a>
             </li>
             <li>
@@ -61,15 +61,15 @@ const Footer = () => {
             </li>
             <li>
               <a href="#" className="hover:underline hover:text-[#00A1E4]">
-                Atención al cliente
+                Customer Service
               </a>
             </li>
           </ul>
         </div>
 
-        {/* Redes sociales */}
+        {/* Social Media */}
         <div>
-          <h4 className="font-semibold mb-4 text-[#00A1E4]">Síguenos</h4>
+          <h4 className="font-semibold mb-4 text-[#00A1E4]">Follow Us</h4>
           <div className="flex space-x-4 text-xl text-blue-300">
             <a href="#" className="hover:text-[#00A1E4]">
               <FaFacebookF />
@@ -89,10 +89,13 @@ const Footer = () => {
 
       <div className="mt-6 text-center text-blue-300">
         &copy; {new Date().getFullYear()}{" "}
-        <a href="https://github.com/rarubinat" className="hover:underline hover:text-[#00A1E4]">
+        <a
+          href="https://github.com/rarubinat"
+          className="hover:underline hover:text-[#00A1E4]"
+        >
           Alba Rubinat
         </a>{" "}
-        | Todos los derechos reservados.
+        | All rights reserved.
       </div>
     </footer>
   );

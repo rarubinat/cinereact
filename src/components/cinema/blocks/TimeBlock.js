@@ -9,7 +9,7 @@ const TimeBlock = ({ selectedTime, handleTimeChange }) => {
 
   return (
     <div>
-      <h4>Selecciona un horario</h4>
+      <h4>Select a film</h4>
       <div className="time-buttons">
         {showtimes.map((showtime, index) => (
           <button
@@ -17,7 +17,7 @@ const TimeBlock = ({ selectedTime, handleTimeChange }) => {
             className={`time-button ${selectedTime === showtime.time ? 'selected' : ''}`}
             onClick={() => handleTimeChange(showtime.time)}
           >
-            {showtime.time} - SALA {showtime.room}
+            {showtime.time} - ROOM {showtime.room}
           </button>
         ))}
       </div>
@@ -26,4 +26,3 @@ const TimeBlock = ({ selectedTime, handleTimeChange }) => {
 };
 
 export default TimeBlock;
-
