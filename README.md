@@ -20,7 +20,6 @@ A sleek, responsive **React-based cinema booking system** that allows users to s
   - ⬜ Available (grey)
 - 🎥 **Multiple movies & showtimes** support
 - 📱 Fully **responsive** UI with modern styling
-- 🌓 **Dark theme** layout with consistent design
 
 ---
 

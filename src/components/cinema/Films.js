@@ -10,23 +10,25 @@ const MovieCard = ({ title, data }) => {
   };
 
   return (
-    <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-md hover:shadow-blue-500/30 transition duration-300">
+    <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-md hover:shadow-blue-500/30 transition duration-300 flex flex-col h-full">
       <img
         src={data.image}
         alt={title}
         className="w-full h-72 object-cover"
       />
-      <div className="p-4 space-y-2">
+
+      <div className="p-4 space-y-2 flex-grow">
         <h3 className="text-lg font-semibold text-blue-300">{title}</h3>
         <p className="text-sm text-zinc-400 truncate">{data.genre}</p>
         <p className="text-xs text-zinc-500">{data.duration} min</p>
-        <button
-          onClick={handleSeeMore}
-          className="mt-2 text-sm text-blue-400 hover:text-white border border-blue-400 px-3 py-1 rounded-md transition"
-        >
-          See More
-        </button>
       </div>
+
+      <button
+        onClick={handleSeeMore}
+        className="w-full py-2 text-sm font-medium text-blue-400 hover:text-white border-t border-blue-500/30 bg-zinc-800 hover:bg-blue-600 transition"
+      >
+        See More
+      </button>
     </div>
   );
 };
@@ -45,7 +47,7 @@ const Films = () => {
         Films
       </h1>
 
-      {/* Improved category buttons */}
+      {/* Categorías */}
       <div className="flex gap-3 mb-8">
         {["NOW_SHOWING", "VOSE", "COMING_SOON"].map((cat) => (
           <button
@@ -63,7 +65,7 @@ const Films = () => {
         ))}
       </div>
 
-      {/* Movies grid */}
+      {/* Grid de películas */}
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {filteredMovies.map(([title, data]) => (
           <MovieCard key={title} title={title} data={data} />

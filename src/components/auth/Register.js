@@ -157,7 +157,7 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
             <option value="Prefer not to say">Prefer not to say</option>
           </select>
 
-          <div className="flex items-start">
+          <div className="flex items-start text-black">
             <input
               type="checkbox"
               name="acceptedTerms"
@@ -181,17 +181,16 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
           {error && (
             <p className="text-red-600 text-center font-medium">{error}</p>
           )}
-
+          
+         
           <button
             type="submit"
             className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition"
           >
             Sign up
           </button>
-        </form>
 
-        {!embedded && (
-          <p className="mt-6 text-center text-black">
+           <p className="mt-6 text-center text-black">
             Already have an account?{" "}
             <span
               onClick={() => setPage("Login")}
@@ -200,7 +199,11 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
               Sign in
             </span>
           </p>
-        )}
+
+        </form>
+
+        
+      
       </div>
     </div>
   );
