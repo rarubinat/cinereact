@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { ArrowUp } from "lucide-react";
 
 import ViewReserve from "./components/profile/ViewReserve";
@@ -7,14 +7,42 @@ import EditProfile from "./components/profile/EditProfile";
 
 import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/NavBar";
+import Loading from "./components/layout/Loading"; // ✅ Componente Loading
 import Home from "./components/Home";
 
 import Films from "./components/cinema/Films";
 import MovieDetails from "./components/cinema/MovieDetails";
 import ReserveMovie from "./components/layout/ReserveMovie";
 
-import AuthModal from "./components/auth/AuthModal"; // ✅ Nuevo import
+import AuthModal from "./components/auth/AuthModal";
 import Register from "./components/auth/Register";
+
+// ✅ Componente con loading visual separado
+const RoutesWithLoading = () => {
+  const location = useLocation();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, [location]);
+
+  if (loading) return <Loading />;
+
+  return (
+    <Routes location={location} key={location.pathname}>
+      <Route path="/" element={<Home />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/films" element={<Films />} />
+      <Route path="/movie/:title" element={<MovieDetails />} />
+      <Route path="/reservemovie" element={<ReserveMovie />} />
+      <Route path="/view-reservations" element={<ViewReserve />} />
+      <Route path="/edit-profile" element={<EditProfile />} />
+    </Routes>
+  );
+};
 
 const App = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -24,7 +52,6 @@ const App = () => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 200);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -39,22 +66,11 @@ const App = () => {
         <Navbar onLoginClick={() => setShowAuthModal(true)} />
 
         <main className="flex-grow px-6 py-8">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-
-            <Route path="/register" element={<Register />} />
-            <Route path="/films" element={<Films />} />
-            <Route path="/movie/:title" element={<MovieDetails />} />
-            <Route path="/reservemovie" element={<ReserveMovie />} />
-            <Route path="/view-reservations" element={<ViewReserve />} />
-            <Route path="/edit-profile" element={<EditProfile />} />
-          </Routes>
+          <RoutesWithLoading />
         </main>
 
         <Footer />
 
-        {/* Botón Scroll to Top */}
         {showScrollTop && (
           <button
             onClick={scrollToTop}
@@ -65,7 +81,6 @@ const App = () => {
           </button>
         )}
 
-        {/* Modal Unificado de Login/Register */}
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       </div>
     </Router>
