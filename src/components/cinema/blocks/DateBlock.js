@@ -11,10 +11,10 @@ const DateTimeline = ({ selectedDate, handleDateChange }) => {
     day.setDate(day.getDate() + index);
     return {
       date: formatDate(day),
-      label: day.toLocaleDateString("es-ES", {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
+      label: day.toLocaleDateString("en-US", {
+        weekday: "short", // Example: Mon, Tue
+        day: "numeric",   // Day of the month
+        month: "short",   // Month abbreviation
       }),
     };
   });
@@ -34,7 +34,7 @@ const DateTimeline = ({ selectedDate, handleDateChange }) => {
 
   return (
     <div className="flex items-center space-x-3 w-full max-w-screen-md mx-auto px-3">
-      {/* Flecha izquierda */}
+      {/* Left arrow */}
       <button
         onClick={() => handleScroll("left")}
         disabled={scrollIndex === 0}
@@ -44,7 +44,7 @@ const DateTimeline = ({ selectedDate, handleDateChange }) => {
         <FaChevronLeft className="text-lg" />
       </button>
 
-      {/* Días visibles */}
+      {/* Visible days */}
       <div className="flex flex-grow space-x-3">
         {visibleDays.map((day) => (
           <button
@@ -64,7 +64,7 @@ const DateTimeline = ({ selectedDate, handleDateChange }) => {
         ))}
       </div>
 
-      {/* Flecha derecha */}
+      {/* Right arrow */}
       <button
         onClick={() => handleScroll("right")}
         disabled={scrollIndex >= maxIndex}

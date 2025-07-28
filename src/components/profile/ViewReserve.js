@@ -44,8 +44,8 @@ const ViewReserve = ({ setPage }) => {
       setReservations(data);
       if (data.length > 0) setFirstReservationId(data[0].id);
     } catch (error) {
-      console.error("Error al obtener las reservas:", error);
-      showAlert("No se pudieron obtener las reservas.");
+      console.error("Error fetching reservations:", error);
+      showAlert("Could not fetch reservations.");
     }
   }, []);
 
@@ -54,14 +54,14 @@ const ViewReserve = ({ setPage }) => {
     const id = confirmModal.reservationId;
     try {
       await db.collection("reservas").doc(id).delete();
-      showAlert("Reserva cancelada correctamente.");
+      showAlert("Reservation successfully canceled.");
       setReservations((prev) => prev.filter((res) => res.id !== id));
       if (firstReservationId === id && reservations.length > 1) {
         setFirstReservationId(reservations[1].id);
       }
     } catch (error) {
-      console.error("Error al cancelar la reserva:", error);
-      showAlert("Error al cancelar la reserva. Intenta de nuevo.");
+      console.error("Error canceling the reservation:", error);
+      showAlert("Error canceling the reservation. Please try again.");
     } finally {
       setConfirmModal({ visible: false, reservationId: null });
     }
@@ -104,20 +104,20 @@ const ViewReserve = ({ setPage }) => {
               Cancel Reserve
             </h3>
             <p className="text-sm text-blue-100 mb-6">
-              ¿Estás seguro que quieres cancelar esta reserva? Esta acción no se puede deshacer.
+              Are you sure you want to cancel this reservation? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setConfirmModal({ visible: false, reservationId: null })}
                 className="px-4 py-2 text-sm rounded-md border border-blue-400 text-blue-200 hover:bg-blue-800 transition"
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 onClick={confirmCancel}
                 className="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
               >
-                Confirmar
+                Confirm
               </button>
             </div>
           </div>
@@ -126,7 +126,7 @@ const ViewReserve = ({ setPage }) => {
 
       {/* Título */}
       <h2 className="text-2xl font-light tracking-wide text-blue-400 mb-6 border-b border-blue-500/20 pb-2">
-        Reservas Guardadas
+        Saved Reservations
       </h2>
 
       {/* Lista de reservas */}
@@ -160,10 +160,10 @@ const ViewReserve = ({ setPage }) => {
                     {reservation.selectedDate}, {reservation.selectedTime}
                   </p>
                   <p className="text-sm">
-                    <span className="text-zinc-400">Sala:</span> {reservation.room}
+                    <span className="text-zinc-400">Room:</span> {reservation.room}
                   </p>
                   <p className="text-sm">
-                    <span className="text-zinc-400">Asientos:</span> {reservation.selectedSeats.join(", ")}
+                    <span className="text-zinc-400">Seats:</span> {reservation.selectedSeats.join(", ")}
                   </p>
                   <p className="text-sm">
                     <span className="text-zinc-400">Total:</span> {reservation.totalPrice} €
@@ -172,7 +172,7 @@ const ViewReserve = ({ setPage }) => {
                     onClick={() => setConfirmModal({ visible: true, reservationId: reservation.id })}
                     className="mt-3 w-full text-sm bg-transparent border border-red-500 text-red-400 hover:bg-red-600 hover:text-white py-1.5 rounded-md transition"
                   >
-                    Cancelar Reserva
+                    Delete Reserve
                   </button>
                 </div>
               </div>
@@ -181,7 +181,7 @@ const ViewReserve = ({ setPage }) => {
         </div>
       ) : (
         <p className="text-center text-zinc-500 mt-10">
-          No hay reservas registradas.
+          There are no registered reservations.
         </p>
       )}
     </div>

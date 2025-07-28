@@ -5,9 +5,6 @@ import { ArrowUp } from "lucide-react";
 import ViewReserve from "./components/profile/ViewReserve";
 import EditProfile from "./components/profile/EditProfile";
 
-import Register from "./components/auth/Register";
-import Login from "./components/auth/Login";
-
 import Footer from "./components/layout/Footer";
 import Navbar from "./components/layout/NavBar";
 import Home from "./components/Home";
@@ -16,15 +13,12 @@ import Films from "./components/cinema/Films";
 import MovieDetails from "./components/cinema/MovieDetails";
 import ReserveMovie from "./components/layout/ReserveMovie";
 
-const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+import AuthModal from "./components/auth/AuthModal"; // ✅ Nuevo import
+import Register from "./components/auth/Register";
 
-  const handleBackdropClick = (e) => {
-    if (e.target.id === "login-backdrop") {
-      setShowLogin(false);
-    }
-  };
+const App = () => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,13 +36,14 @@ const App = () => {
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-black text-white font-sans relative">
-        <Navbar onLoginClick={() => setShowLogin(true)} />
+        <Navbar onLoginClick={() => setShowAuthModal(true)} />
 
         <main className="flex-grow px-6 py-8">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/home" element={<Home />} />
+
+            <Route path="/register" element={<Register />} />
             <Route path="/films" element={<Films />} />
             <Route path="/movie/:title" element={<MovieDetails />} />
             <Route path="/reservemovie" element={<ReserveMovie />} />
@@ -59,7 +54,7 @@ const App = () => {
 
         <Footer />
 
-        {/* Botón Scroll to Top Mejorado */}
+        {/* Botón Scroll to Top */}
         {showScrollTop && (
           <button
             onClick={scrollToTop}
@@ -70,18 +65,8 @@ const App = () => {
           </button>
         )}
 
-        {/* Modal de Login */}
-        {showLogin && (
-          <div
-            id="login-backdrop"
-            onClick={handleBackdropClick}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-center items-center"
-          >
-            <div className="relative w-full max-w-md p-4">
-              <Login onClose={() => setShowLogin(false)} />
-            </div>
-          </div>
-        )}
+        {/* Modal Unificado de Login/Register */}
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       </div>
     </Router>
   );

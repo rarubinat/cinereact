@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../../utils/firebase";
 import db from "../../utils/firebase";
-import firebase from "firebase/app";
 
 const EditProfile = ({ setPage }) => {
   const [form, setForm] = useState({
@@ -24,20 +23,18 @@ const EditProfile = ({ setPage }) => {
             setForm({
               name: data.name || "",
               phone: data.phone || "",
-              birthdate: data.birthdate && data.birthdate.toDate
-                ? data.birthdate.toDate().toISOString().slice(0, 10)
-                : "",
+              birthdate: data.birthdate || "",
               gender: data.gender || "",
             });
             setError("");
           } else {
-            setError("No se encontró el perfil del usuario.");
+            setError("User profile not found.");
           }
         } catch {
-          setError("Error al cargar datos.");
+          setError("Error loading data.");
         }
       } else {
-        setError("No estás autenticado");
+        setError("You are not authenticated.");
       }
       setLoading(false);
     });
@@ -47,7 +44,7 @@ const EditProfile = ({ setPage }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -57,98 +54,115 @@ const EditProfile = ({ setPage }) => {
     try {
       const user = auth.currentUser;
       if (!user) {
-        setError("No estás autenticado");
+        setError("You are not authenticated.");
         return;
       }
       if (!form.name.trim()) {
-        setError("El nombre no puede estar vacío.");
+        setError("Name cannot be empty.");
         return;
       }
 
       await db.collection("users").doc(user.uid).update({
         name: form.name,
         phone: form.phone,
-        birthdate: firebase.firestore.Timestamp.fromDate(new Date(form.birthdate)),
+        birthdate: form.birthdate, // Guardamos como string
         gender: form.gender,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: db.FieldValue.serverTimestamp(),
       });
 
-      alert("Perfil actualizado correctamente.");
+      alert("Profile updated successfully.");
       setPage("Profile");
     } catch (err) {
-      setError("Error al actualizar el perfil.");
+      setError("Error updating profile.");
       console.error(err);
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Cargando datos...</p>;
+  if (loading)
+    return <p className="text-zinc-400 mt-10 px-6">Loading data...</p>;
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md mt-10">
-      <h2 className="text-2xl font-semibold mb-6 text-center">Editar Perfil</h2>
+    <div className="min-h-screen bg-zinc-950 text-white px-6 py-10">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-zinc-900 rounded-xl p-8 shadow-xl border border-zinc-700"
+      >
+        <h2 className="text-2xl font-semibold text-blue-400 mb-8 tracking-wide">
+          Edit Profile
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Nombre completo</label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
+        {/* Name */}
+        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+          Full Name
+        </label>
+        <input
+          type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          required
+          placeholder="Your full name"
+          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Teléfono (opcional)</label>
-          <input
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            pattern="\d*"
-            placeholder="Solo números"
-            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
+        {/* Phone */}
+        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+          Phone (optional)
+        </label>
+        <input
+          type="text"
+          name="phone"
+          value={form.phone}
+          onChange={handleChange}
+          pattern="\d*"
+          placeholder="Numbers only"
+          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Fecha de nacimiento</label>
-          <input
-            type="date"
-            name="birthdate"
-            value={form.birthdate}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
+        {/* Birthdate */}
+        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+          Birthdate
+        </label>
+        <input
+          type="date"
+          name="birthdate"
+          value={form.birthdate}
+          onChange={handleChange}
+          required
+          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Género</label>
-          <select
-            name="gender"
-            value={form.gender}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="">Seleccione género</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
-            <option value="Prefiero no decir">Prefiero no decir</option>
-          </select>
-        </div>
+        {/* Gender */}
+        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+          Gender
+        </label>
+        <select
+          name="gender"
+          value={form.gender}
+          onChange={handleChange}
+          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        >
+          <option value="" className="text-zinc-400">
+            Select gender
+          </option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+          <option value="Prefer not to say">Prefer not to say</option>
+        </select>
 
-        {error && <p className="text-red-600 text-center">{error}</p>}
+        {error && (
+          <p className="mb-6 text-center text-red-500 font-semibold select-none">
+            {error}
+          </p>
+        )}
 
-        <div className="flex justify-between items-center">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-          >
-            Guardar Cambios
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold shadow-md transition-transform active:scale-95"
+        >
+          Save Changes
+        </button>
       </form>
     </div>
   );

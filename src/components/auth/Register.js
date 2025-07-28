@@ -1,12 +1,9 @@
-// Importaciones necesarias desde React y Firebase
 import React, { useState } from "react";
-import firebase from "firebase/app"; // Para acceder a firestore.FieldValue
-import { auth } from "../../utils/firebase"; // Instancia de autenticación de Firebase
-import db from "../../utils/firebase"; // Instancia de Firestore (base de datos)
+import { auth } from "../../utils/firebase";
+import db from "../../utils/firebase";
+import firebase from "firebase/app";
 
-// Componente funcional Register que recibe una función para cambiar de página (setPage)
-const Register = ({ setPage }) => {
-  // Estado local que guarda los campos del formulario
+const Register = ({ embedded = false, onSuccess, setPage }) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -18,203 +15,195 @@ const Register = ({ setPage }) => {
     acceptedTerms: false,
   });
 
-  // Estado para mostrar errores al usuario
   const [error, setError] = useState("");
 
-  // Función auxiliar para verificar si el usuario tiene al menos 13 años
   const isOldEnough = (birthdate) => {
     if (!birthdate) return false;
     const today = new Date();
-    const birthDateObj = new Date(birthdate);
-    let age = today.getFullYear() - birthDateObj.getFullYear();
-    const m = today.getMonth() - birthDateObj.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
+    const dob = new Date(birthdate);
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
       age--;
     }
     return age >= 13;
   };
 
-  // Función para manejar cambios en cualquier input del formulario
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    // Actualiza el campo correspondiente en el estado
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // Función principal que maneja el registro del usuario
-  const handleRegister = (e) => {
-    e.preventDefault(); // Previene el recargo de la página
-    setError(""); // Reinicia los errores
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    // Validación: debe aceptar los términos
-    if (!form.acceptedTerms) {
-      setError("Debes aceptar los términos y condiciones.");
-      return;
-    }
+    const {
+      name,
+      email,
+      password,
+      confirmPassword,
+      phone,
+      birthdate,
+      gender,
+      acceptedTerms,
+    } = form;
 
-    // Validación: debe tener al menos 13 años
-    if (!isOldEnough(form.birthdate)) {
-      setError("Debes tener al menos 13 años para registrarte.");
-      return;
-    }
+    if (!acceptedTerms) return setError("Debes aceptar los términos y condiciones.");
+    if (!isOldEnough(birthdate)) return setError("Debes tener al menos 13 años para registrarte.");
+    if (password !== confirmPassword) return setError("Las contraseñas no coinciden.");
+    if (phone && !/^\d+$/.test(phone)) return setError("El teléfono solo debe contener números.");
 
-    // Validación: las contraseñas deben coincidir
-    if (form.password !== form.confirmPassword) {
-      setError("Las contraseñas no coinciden.");
-      return;
-    }
-
-    // Validación: si hay teléfono, debe contener solo números
-    if (form.phone && !/^\d+$/.test(form.phone)) {
-      setError("El teléfono solo debe contener números.");
-      return;
-    }
-
-    // Registro del usuario en Firebase Authentication
-    auth
-      .createUserWithEmailAndPassword(form.email, form.password)
-      .then(async (userCredential) => {
-        const uid = userCredential.user.uid; // UID único del usuario creado
-
-        // Se guarda la información adicional del usuario en Firestore
-        await db.collection("users").doc(uid).set({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          birthdate: form.birthdate,
-          gender: form.gender,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(), // Marca de tiempo del servidor
-        });
-
-        // Mensaje de éxito y redirección al login
-        alert("Registro exitoso. Ahora puedes iniciar sesión.");
-        setPage("Login");
-      })
-      .catch((err) => {
-        // Muestra cualquier error devuelto por Firebase (por ejemplo, email ya registrado)
-        setError(err.message);
+    try {
+      const { user } = await auth.createUserWithEmailAndPassword(email, password);
+      await db.collection("users").doc(user.uid).set({
+        name,
+        email,
+        phone,
+        birthdate,
+        gender,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
+
+      if (embedded && onSuccess) {
+        onSuccess();
+      } else if (setPage) {
+        setPage("Login");
+      } else {
+        alert("Registro exitoso. Ahora puedes iniciar sesión.");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
-  // JSX que renderiza el formulario de registro
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Registro de Usuario</h2>
+    <div className="w-screen h-screen flex items-center justify-center bg-white">
+      <div className="w-full max-w-md p-8 rounded-2xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-center text-[#0a1e3f] mb-6">Register</h2>
 
-      <form onSubmit={handleRegister} style={{ maxWidth: "400px", margin: "0 auto" }}>
-        {/* Campo: Nombre completo */}
-        <label htmlFor="name">Nombre completo</label><br />
-        <input
-          id="name"
-          name="name"
-          placeholder="Nombre completo"
-          value={form.name}
-          onChange={handleChange}
-          required
-        /><br />
-
-        {/* Campo: Correo electrónico */}
-        <label htmlFor="email">Correo electrónico</label><br />
-        <input
-          id="email"
-          type="email"
-          name="email"
-          placeholder="Correo electrónico"
-          value={form.email}
-          onChange={handleChange}
-          required
-        /><br />
-
-        {/* Campo: Contraseña */}
-        <label htmlFor="password">Contraseña</label><br />
-        <input
-          id="password"
-          type="password"
-          name="password"
-          placeholder="Contraseña"
-          value={form.password}
-          onChange={handleChange}
-          required
-        /><br />
-
-        {/* Campo: Confirmación de contraseña */}
-        <label htmlFor="confirmPassword">Confirmar contraseña</label><br />
-        <input
-          id="confirmPassword"
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirmar contraseña"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          required
-        /><br />
-
-        {/* Campo: Teléfono (opcional) */}
-        <label htmlFor="phone">Teléfono (opcional)</label><br />
-        <input
-          id="phone"
-          type="tel"
-          name="phone"
-          placeholder="Teléfono"
-          value={form.phone}
-          onChange={handleChange}
-        /><br />
-
-        {/* Campo: Fecha de nacimiento */}
-        <label htmlFor="birthdate">Fecha de nacimiento</label><br />
-        <input
-          id="birthdate"
-          type="date"
-          name="birthdate"
-          value={form.birthdate}
-          onChange={handleChange}
-          required
-        /><br />
-
-        {/* Campo: Género (opcional) */}
-        <label htmlFor="gender">Género (opcional)</label><br />
-        <select id="gender" name="gender" value={form.gender} onChange={handleChange}>
-          <option value="">Seleccione género</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Femenino">Femenino</option>
-          <option value="Otro">Otro</option>
-          <option value="Prefiero no decir">Prefiero no decir</option>
-        </select><br /><br />
-
-        {/* Aceptación de términos y condiciones */}
-        <label>
+        <form onSubmit={handleRegister} className="space-y-4">
           <input
-            type="checkbox"
-            name="acceptedTerms"
-            checked={form.acceptedTerms}
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={form.name}
             onChange={handleChange}
-          />{" "}
-          Acepto los <a href="/terminos" target="_blank" rel="noreferrer">términos y condiciones</a>
-        </label><br /><br />
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          />
 
-        {/* Botón para enviar el formulario */}
-        <button type="submit">Registrarse</button>
-      </form>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          />
 
-      {/* Muestra errores en rojo si existen */}
-      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          />
 
-      {/* Enlace para redirigir al login si ya tiene cuenta */}
-      <p style={{ marginTop: "15px" }}>
-        ¿Ya tienes cuenta?{" "}
-        <span
-          onClick={() => setPage("Login")}
-          style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
-        >
-          Inicia sesión
-        </span>
-      </p>
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          />
+
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone (optional)"
+            value={form.phone}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          />
+
+          <input
+            type="date"
+            name="birthdate"
+            value={form.birthdate}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          />
+
+          <select
+            name="gender"
+            value={form.gender}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          >
+            <option value="">Select gender (optional)</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              name="acceptedTerms"
+              checked={form.acceptedTerms}
+              onChange={handleChange}
+              className="mt-1 mr-2"
+            />
+            <label className="text-sm">
+              I accept the{" "}
+              <a
+                href="/terminos"
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600 underline"
+              >
+                terms and conditions
+              </a>
+            </label>
+          </div>
+
+          {error && (
+            <p className="text-red-600 text-center font-medium">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition"
+          >
+            Sign up
+          </button>
+        </form>
+
+        {!embedded && (
+          <p className="mt-6 text-center text-black">
+            Already have an account?{" "}
+            <span
+              onClick={() => setPage("Login")}
+              className="text-blue-600 cursor-pointer underline"
+            >
+              Sign in
+            </span>
+          </p>
+        )}
+      </div>
     </div>
   );
 };
 
-// Exporta el componente Register para que pueda ser usado en otros archivos
 export default Register;

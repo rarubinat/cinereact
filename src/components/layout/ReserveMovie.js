@@ -42,7 +42,7 @@ const ReserveMovie = () => {
 
   const handleSaveReservation = () => {
     if (!selectedSeats.length) {
-      showAlert("Por favor selecciona al menos un asiento.");
+      showAlert("Please select at least one seat.");
       return;
     }
 
@@ -51,7 +51,7 @@ const ReserveMovie = () => {
 
     if (!currentUser) {
       setLoading(false);
-      showAlert("Debes iniciar sesión para guardar una reserva.");
+      showAlert("You must log in to save a reservation.");
       return;
     }
 
@@ -70,13 +70,13 @@ const ReserveMovie = () => {
       .add(reservation)
       .then(() => {
         setLoading(false);
-        showAlert("¡Reserva guardada correctamente!");
+        showAlert("Reservation saved successfully!");
         setTimeout(() => navigate("/view-reservations"), 1000);
       })
       .catch((error) => {
         setLoading(false);
-        console.error("Error guardando reserva:", error);
-        showAlert("Error al guardar la reserva. Intenta de nuevo.");
+        console.error("Error saving reservation:", error);
+        showAlert("Error saving the reservation. Please try again.");
       });
   };
 
