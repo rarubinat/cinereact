@@ -23,12 +23,14 @@ const MovieCard = ({ title, data }) => {
         <p className="text-xs text-zinc-500">{data.duration} min</p>
       </div>
 
-      <button
-        onClick={handleSeeMore}
-        className="w-full py-2 text-sm font-medium text-blue-400 hover:text-white border-t border-blue-500/30 bg-zinc-800 hover:bg-blue-600 transition"
-      >
-        See More
-      </button>
+      {data.category !== "COMING_SOON" && (
+        <button
+          onClick={handleSeeMore}
+          className="w-full py-2 text-sm font-medium text-blue-400 hover:text-white border-t border-blue-500/30 bg-zinc-800 hover:bg-blue-600 transition"
+        >
+          See More
+        </button>
+      )}
     </div>
   );
 };
@@ -43,13 +45,13 @@ const Films = () => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white px-6 md:px-12 py-10">
-      <h1 className="text-3xl font-light text-blue-200 border-b border-blue-500/20 mb-6 pb-2">
+      <h3 className="text-3xl font-light text-blue-200 border-b border-blue-500/20 mb-6 pb-2">
         Films
-      </h1>
+      </h3>
 
       {/* Categorías */}
       <div className="flex gap-3 mb-8">
-        {["NOW_SHOWING", "VOSE", "COMING_SOON"].map((cat) => (
+        {["NOW_SHOWING", "COMING_SOON"].map((cat) => (
           <button
             key={cat}
             onClick={() => setFilter(cat)}
@@ -60,7 +62,7 @@ const Films = () => {
                   : "bg-zinc-800 text-blue-300 border-blue-500/30 hover:bg-blue-500/20"
               }`}
           >
-            {cat === "NOW_SHOWING" ? "Now Showing" : cat === "COMING_SOON" ? "Coming Soon" : "VOSE"}
+            {cat === "NOW_SHOWING" ? "Now Showing" : "Coming Soon"}
           </button>
         ))}
       </div>

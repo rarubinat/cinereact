@@ -51,9 +51,14 @@ yarn build
 
 # Deploy to Firebase
 firebase deploy
+
+# Without/functions deploy
+firebase deploy --only hosting
 ```
 
 ## 📅 Update History
+
+**2025-08-01**: Added support for categorizing purchased tickets into Upcoming Events and Past Events for better user experience.
 
 **2025-07-25**: Login and Registration Modal integration.
 

@@ -57,6 +57,7 @@ const ReserveMovie = () => {
 
     const reservation = {
       userId: currentUser.uid,
+      email: currentUser.email, // ✅ Añadido para enviar el correo
       selectedMovie,
       selectedDate: formatDate(selectedDate),
       selectedTime,
@@ -148,8 +149,7 @@ const ReserveMovie = () => {
       {selectedSeats.length > 0 && (
         <div className="mt-10 bg-blue-700 bg-opacity-30 rounded p-6">
           <p className="text-lg mb-2">
-            <strong>Seats selected:</strong>{" "}
-            {selectedSeats.join(", ")}
+            <strong>Seats selected:</strong> {selectedSeats.join(", ")}
           </p>
           <p className="text-lg mb-6">
             <strong>Price:</strong> {totalPrice.toFixed(2)} €

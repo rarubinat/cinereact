@@ -12,6 +12,7 @@ const EditProfile = ({ setPage }) => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [submitted, setSubmitted] = useState(false); // controla el mensaje de error
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -26,15 +27,12 @@ const EditProfile = ({ setPage }) => {
               birthdate: data.birthdate || "",
               gender: data.gender || "",
             });
-            setError("");
           } else {
-            setError("User profile not found.");
+            console.warn("User profile not found."); // solo en consola
           }
-        } catch {
-          setError("Error loading data.");
+        } catch (err) {
+          console.error("User profile not found.", err); // solo en consola
         }
-      } else {
-        setError("You are not authenticated.");
       }
       setLoading(false);
     });
@@ -50,6 +48,7 @@ const EditProfile = ({ setPage }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSubmitted(true);
 
     try {
       const user = auth.currentUser;
@@ -65,9 +64,9 @@ const EditProfile = ({ setPage }) => {
       await db.collection("users").doc(user.uid).update({
         name: form.name,
         phone: form.phone,
-        birthdate: form.birthdate, // Guardamos como string
+        birthdate: form.birthdate,
         gender: form.gender,
-        updatedAt: db.FieldValue.serverTimestamp(),
+        updatedAt: new Date(), // Alternativa a serverTimestamp
       });
 
       alert("Profile updated successfully.");
@@ -78,10 +77,7 @@ const EditProfile = ({ setPage }) => {
     }
   };
 
-  if (loading)
-    return <p className="text-zinc-400 mt-10 px-6">Loading data...</p>;
-
-  return (
+ return (
     <div className="min-h-screen bg-zinc-950 text-white px-6 py-10">
       <form
         onSubmit={handleSubmit}
@@ -151,11 +147,7 @@ const EditProfile = ({ setPage }) => {
           <option value="Prefer not to say">Prefer not to say</option>
         </select>
 
-        {error && (
-          <p className="mb-6 text-center text-red-500 font-semibold select-none">
-            {error}
-          </p>
-        )}
+       
 
         <button
           type="submit"

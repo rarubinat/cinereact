@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import Seat from "./Seat";
 
-// Función que genera una fila de asientos con Tailwind
+// Function that generates a row of seats with Tailwind
 const GenerateSeats = (seatNumbers, onSeatSelected, selectedMovie, selectedTime, selectedDate) => (
   <div className="flex justify-center gap-2 mb-2">
     {seatNumbers.map((seatNumber) => (
@@ -67,7 +67,21 @@ const SeatMatrix = ({ onSeatSelection, selectedMovie, selectedTime, selectedDate
         screen
       </div>
 
-    
+      {/* Seat Legend */}
+      <div className="flex justify-center gap-6 max-w-md mx-auto">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-gray-500 rounded-sm border border-gray-700"></div>
+          <span>Available</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-blue-500 rounded-sm border border-gray-700"></div>
+          <span>Selected</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-red-600 rounded-sm border border-red-800"></div>
+          <span>Occupied</span>
+        </div>
+      </div>
     </div>
   );
 };
