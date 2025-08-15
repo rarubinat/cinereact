@@ -58,7 +58,9 @@ firebase deploy --only hosting
 
 ## 📅 Update History
 
-**2025-08-15**: New layout!
+**2025-08-15**: Payment method.
+
+**2025-08-14**: New layout!
 
 **2025-08-01**: Added support for categorizing purchased tickets into Upcoming Events and Past Events for better user experience.
 

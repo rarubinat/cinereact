@@ -63,7 +63,7 @@ const SeatMatrix = ({ onSeatSelection, selectedMovie, selectedTime, selectedDate
           <div className="w-3 h-3 bg-gray-800 rounded"></div> Selected
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-gray-200 rounded"></div> Unavailable
+          <div className="w-3 h-3 bg-gray-500 rounded"></div> Unavailable
         </div>
       </div>
 

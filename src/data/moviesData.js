@@ -1,9 +1,9 @@
-const moviesData = { 
+const moviesData = {
   "Spider-Man: Across the Spider-Verse": {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Spider-Man__Cruzando_el_Multiverso.avif?alt=media&token=f4fa147a-a1cf-4b53-9e28-13226c5fe929",
-    synopsis: "Miles Morales teams up with Gwen Stacy and a group of Spider-People...",
+    synopsis: "Miles Morales teams up with Gwen Stacy and a group of Spider-People to battle a powerful new villain known as The Spot, who threatens the multiverse. As they clash over how to handle the situation, Miles finds himself on the run from Miguel O'Hara and other Spider-People.",
     duration: 140,
     releaseDate: "2023-06-02",
     genre: "Animation, Action, Adventure",
@@ -20,7 +20,7 @@ const moviesData = {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Insidious__La_Puerta_Roja.avif?alt=media&token=ba158c51-7e50-4f5e-8557-c2165dec3c73",
-    synopsis: "Josh and Dalton return to the spiritual realm to confront...",
+    synopsis: "Josh and Dalton Lambert must delve deeper into The Further than ever before, confronting their family's dark past and facing a host of new and more horrifying terrors.",
     duration: 107,
     releaseDate: "2023-07-07",
     genre: "Horror, Mystery, Thriller",
@@ -36,7 +36,7 @@ const moviesData = {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Oppenheimer.avif?alt=media&token=6562e420-10d0-4611-a948-86455c366c4f",
-    synopsis: "Biography of J. Robert Oppenheimer, the physicist behind...",
+    synopsis: "A dramatization of the life story of J. Robert Oppenheimer, the physicist who played a key role in the development of the atomic bomb during World War II.",
     duration: 180,
     releaseDate: "2023-07-21",
     genre: "Drama, History, Biography",
@@ -53,7 +53,7 @@ const moviesData = {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Barbie.avif?alt=media&token=ae8474ce-d473-4d8d-bea9-4ade11565265",
-    synopsis: "Barbie lives in Barbieland, a perfect world... until she starts questioning...",
+    synopsis: "Barbie lives in Barbieland, a perfect world, until she starts questioning her existence and embarks on a journey of self-discovery in the real world.",
     duration: 114,
     releaseDate: "2023-07-21",
     genre: "Comedy, Adventure, Fantasy",
@@ -70,7 +70,7 @@ const moviesData = {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Super_Mario_Bros._La_Pel%C3%ADcula.avif?alt=media&token=bf162e79-7a0e-4e53-b658-4f5e50972a14",
-    synopsis: "Mario and Luigi, two plumber brothers from Brooklyn...",
+    synopsis: "Mario and Luigi, two plumber brothers from Brooklyn, are transported to another world where they become entangled in a battle between the Mushroom Kingdom and the Koopas.",
     duration: 92,
     releaseDate: "2023-04-05",
     genre: "Animation, Adventure, Comedy",
@@ -87,7 +87,7 @@ const moviesData = {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Transformers__El_Despertar_de_las_Bestias.avif?alt=media&token=e27ce527-04b4-463d-8eff-75f856c7e16f",
-    synopsis: "The Autobots and their new allies, the Maximals, face an ancient threat...",
+    synopsis: "The Autobots and their new allies, the Maximals, face an ancient threat from Unicron, a planet-eating Transformer, as they battle to protect Earth from destruction.",
     duration: 127,
     releaseDate: "2023-06-09",
     genre: "Action, Science Fiction, Adventure",
@@ -103,7 +103,7 @@ const moviesData = {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Gran_Turismo.avif?alt=media&token=c4da5eb9-8362-4d2a-8154-992a4c3acedf",
-    synopsis: "Based on a true story, a young gamer skilled in Gran Turismo...",
+    synopsis: "Based on a true story, a young gamer skilled in Gran Turismo racing games gets the chance to become a real-life professional race car driver.",
     duration: 135,
     releaseDate: "2023-08-25",
     genre: "Action, Drama, Sport",
@@ -120,7 +120,7 @@ const moviesData = {
     category: "NOW_SHOWING",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Fast_%26_Furious_X.avif?alt=media&token=4ab6659d-6c97-4491-8983-370c19360a83",
-    synopsis: "Dom Toretto faces his most personal challenge yet...",
+    synopsis: "Dom Toretto faces his most personal challenge yet as a new threat emerges, targeting his family and everything he holds dear.",
     duration: 141,
     releaseDate: "2023-05-19",
     genre: "Action, Crime, Thriller",
@@ -133,20 +133,18 @@ const moviesData = {
       { time: "6:00 PM", room: "6" }
     ]
   },
-
-
-    "F1 La película": {
+  "F1: The Movie": {
     category: "COMING_SOON",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/F1_La_Pelicula.avif?alt=media&token=362184fd-f282-45d6-ad78-f47c46ebb587",
-    synopsis: "Una historia ambientada en el mundo de la Fórmula 1 que sigue a un piloto veterano que regresa para entrenar a un joven talento mientras enfrenta sus propios fantasmas del pasado. Velocidad, drama y pasión se combinan en esta emocionante producción.",
+    synopsis: "A story set in the world of Formula 1, following a veteran driver who returns to train a young talent while facing his own past demons. Speed, drama, and passion combine in this thrilling production.",
     duration: 130,
     releaseDate: "2025-06-13",
     genre: "Action, Drama, Sport",
     directors: ["Joseph Kosinski"],
     writers: ["Ehren Kruger"],
     rating: "Unrated",
-    showtimes: [] // Coming soon → sin horarios aún
+    showtimes: [] // Coming soon → no showtimes yet
   },
 
   "Sé lo que hicistéis el último verano (2025)": {

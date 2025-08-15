@@ -46,7 +46,7 @@ const Seat = ({ seatno, onSeatSelected, selectedMovie, selectedTime, selectedDat
       ? 'bg-gray-200 cursor-not-allowed'
       : isSelected
         ? 'bg-gray-800 text-white scale-105'
-        : 'bg-gray-300 hover:bg-gray-800 hover:text-white hover:scale-105 cursor-pointer'}
+        : 'bg-gray-500 hover:bg-gray-800 hover:text-white hover:scale-105 cursor-pointer'}
   `;
 
   return (
