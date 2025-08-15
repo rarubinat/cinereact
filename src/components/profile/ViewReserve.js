@@ -9,17 +9,13 @@ const ViewReserve = ({ setPage }) => {
     visible: false,
     reservationId: null,
   });
-  const [activeTab, setActiveTab] = useState("upcoming"); // pestaña activa
+  const [activeTab, setActiveTab] = useState("upcoming");
 
-  // Mostrar alerta temporal
   const showAlert = (message) => {
     setAlert({ message, visible: true });
-    setTimeout(() => {
-      setAlert({ message: "", visible: false });
-    }, 3000);
+    setTimeout(() => setAlert({ message: "", visible: false }), 3000);
   };
 
-  // Obtener reservas del usuario autenticado
   const fetchReservations = useCallback(async () => {
     try {
       const currentUser = auth.currentUser;
@@ -47,7 +43,6 @@ const ViewReserve = ({ setPage }) => {
     }
   }, []);
 
-  // Cancelar reserva
   const confirmCancel = async () => {
     const id = confirmModal.reservationId;
     try {
@@ -62,67 +57,54 @@ const ViewReserve = ({ setPage }) => {
     }
   };
 
-  // Cargar reservas al montar el componente
   useEffect(() => {
     fetchReservations();
   }, [fetchReservations]);
 
-  // Filtrar reservas por fecha
+  // Filtrado por fecha
   const today = new Date();
-  const upcomingReservations = reservations.filter((res) => {
-    const [day, month, year] = res.selectedDate.split("/"); // si está en formato DD/MM/YYYY
-    const resDate = new Date(`${year}-${month}-${day}`);
-    return resDate >= today;
-  });
-
-  const pastReservations = reservations.filter((res) => {
-    const [day, month, year] = res.selectedDate.split("/");
-    const resDate = new Date(`${year}-${month}-${day}`);
-    return resDate < today;
-  });
+  const toDate = (ddmmyyyy) => {
+    const [d, m, y] = ddmmyyyy.split("/");
+    return new Date(`${y}-${m}-${d}`);
+  };
+  const upcomingReservations = reservations.filter((r) => toDate(r.selectedDate) >= today);
+  const pastReservations = reservations.filter((r) => toDate(r.selectedDate) < today);
 
   const renderReservationCard = (reservation) => {
-    const selectedMovieData = moviesData[reservation.selectedMovie] || {};
-    const movieImage = selectedMovieData.image || null;
+    const movie = moviesData[reservation.selectedMovie] || {};
+    const img = movie.image;
 
     return (
       <div
         key={reservation.id}
-        className="rounded-xl overflow-hidden shadow-md bg-zinc-900 border border-zinc-700"
+        className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col h-full"
       >
-        {movieImage && (
+        {img && (
           <img
-            src={movieImage}
-            alt={`Imagen de ${reservation.selectedMovie}`}
-            className="w-full h-48 object-cover"
+            src={img}
+            alt={reservation.selectedMovie}
+            className="w-full h-56 md:h-64 object-cover"
           />
         )}
-        <div className="p-4 space-y-2">
-          <h3 className="text-lg font-semibold text-blue-300">
-            {reservation.selectedMovie}
-          </h3>
-          <p className="text-sm text-zinc-400">
-            {reservation.selectedDate}, {reservation.selectedTime}
+        <div className="p-4 space-y-1 flex-grow">
+          <h3 className="text-lg font-semibold text-black">{reservation.selectedMovie}</h3>
+          <p className="text-sm text-gray-600">
+            {reservation.selectedDate} • {reservation.selectedTime}
           </p>
-          <p className="text-sm">
-            <span className="text-zinc-400">Room:</span> {reservation.room}
+          <p className="text-sm text-gray-600">Room: {reservation.room}</p>
+          <p className="text-sm text-gray-600">
+            Seats: {Array.isArray(reservation.selectedSeats) ? reservation.selectedSeats.join(", ") : "-"}
           </p>
-          <p className="text-sm">
-            <span className="text-zinc-400">Seats:</span>{" "}
-            {reservation.selectedSeats.join(", ")}
-          </p>
-          <p className="text-sm">
-            <span className="text-zinc-400">Total:</span>{" "}
-            {reservation.totalPrice} €
-          </p>
+          <p className="text-sm font-medium text-gray-900">Total: {reservation.totalPrice} €</p>
+
           {activeTab === "upcoming" && (
             <button
               onClick={() =>
                 setConfirmModal({ visible: true, reservationId: reservation.id })
               }
-              className="mt-3 w-full text-sm bg-transparent border border-red-500 text-red-400 hover:bg-red-600 hover:text-white py-1.5 rounded-md transition"
+              className="mt-3 w-full text-sm rounded-full border border-red-300 text-red-600 hover:bg-red-50 py-2 transition"
             >
-              Delete Reserve
+              Cancel reservation
             </button>
           )}
         </div>
@@ -131,50 +113,71 @@ const ViewReserve = ({ setPage }) => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white px-6 py-10 relative">
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6">
-        <button
-          onClick={() => setActiveTab("upcoming")}
-          className={`px-4 py-2 rounded-lg ${
-            activeTab === "upcoming"
-              ? "bg-blue-600 text-white"
-              : "bg-zinc-800 text-zinc-400"
-          }`}
-        >
-          Upcoming
-        </button>
-        <button
-          onClick={() => setActiveTab("past")}
-          className={`px-4 py-2 rounded-lg ${
-            activeTab === "past"
-              ? "bg-blue-600 text-white"
-              : "bg-zinc-800 text-zinc-400"
-          }`}
-        >
-          Past Reservations
-        </button>
+    <div className="min-h-screen bg-[#fdfcfb] text-black px-6 md:px-12 py-10">
+      <h1 className="text-3xl font-bold mb-6">My Reservations</h1>
+
+      {/* Tabs estilo “pills” */}
+      <div className="flex gap-3 mb-8">
+        {[
+          { key: "upcoming", label: "Upcoming" },
+          { key: "past", label: "Past Reservations" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-1.5 text-sm font-medium rounded-full transition
+              ${
+                activeTab === tab.key
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Lista según la pestaña */}
+      {/* Listado */}
       {activeTab === "upcoming" ? (
-        upcomingReservations.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        upcomingReservations.length ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {upcomingReservations.map(renderReservationCard)}
           </div>
         ) : (
-          <p className="text-center text-zinc-500 mt-10">
-            No tienes reservas próximas.
-          </p>
+          <p className="text-center text-gray-500 mt-10">You have no upcoming reservations.</p>
         )
-      ) : pastReservations.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      ) : pastReservations.length ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
           {pastReservations.map(renderReservationCard)}
         </div>
       ) : (
-        <p className="text-center text-zinc-500 mt-10">
-          No hay reservas anteriores.
-        </p>
+        <p className="text-center text-gray-500 mt-10">There are no past reservations.</p>
+      )}
+
+      {/* Modal de confirmación (claro) */}
+      {confirmModal.visible && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full">
+            <h2 className="text-lg font-semibold text-black mb-2">Cancel reservation</h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to cancel this reservation? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmModal({ visible: false, reservationId: null })}
+                className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-800"
+              >
+                Keep
+              </button>
+              <button
+                onClick={confirmCancel}
+                className="px-4 py-2 rounded-full bg-black text-white hover:opacity-90"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

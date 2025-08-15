@@ -30,7 +30,7 @@ const Login = ({ embedded = false, onSuccess, setPage }) => {
       setSuccessMsg("Login exitoso");
       setTimeout(() => {
         if (embedded && onSuccess) {
-          onSuccess(); // Cierra el modal
+          onSuccess();
         } else {
           navigate("/films");
         }
@@ -46,8 +46,18 @@ const Login = ({ embedded = false, onSuccess, setPage }) => {
   };
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center bg-white">
-      <div className="w-full max-w-md p-8 rounded-2xl shadow-2xl">
+    <div className="w-screen h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm fixed inset-0 z-50">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-2xl relative">
+        {/* Botón cerrar para embedded modal */}
+        {embedded && onSuccess && (
+          <div
+            className="absolute top-4 right-4 text-2xl cursor-pointer text-gray-700 hover:text-black"
+            onClick={onSuccess}
+          >
+            &times;
+          </div>
+        )}
+
         <h2 className="text-3xl font-bold text-center text-[#0a1e3f] mb-6">
           Log In
         </h2>
@@ -63,19 +73,19 @@ const Login = ({ embedded = false, onSuccess, setPage }) => {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mb-3 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          className="mb-3 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
         />
         <input
           type="password"
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-3 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
+          className="mb-3 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#004aad] text-black"
         />
 
         <button
           onClick={handleLogin}
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition font-semibold"
+          className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition font-semibold mt-2"
         >
           Log In
         </button>

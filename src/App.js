@@ -62,7 +62,7 @@ const App = () => {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen bg-black text-white font-sans relative">
+      <div className="flex flex-col min-h-screen bg-[#fdfcfb] text-black font-sans relative">
         <Navbar onLoginClick={() => setShowAuthModal(true)} />
 
         <main className="flex-grow px-6 py-8">
@@ -70,16 +70,26 @@ const App = () => {
         </main>
 
         <Footer />
+{showScrollTop && (
+  <button
+    onClick={scrollToTop}
+    className="fixed bottom-6 right-6 bg-black text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-125 hover:shadow-[0_0_15px_rgba(0,0,0,0.5)] z-50 flex items-center justify-center"
+    aria-label="Subir"
+  >
+    <ArrowUp
+      className="w-5 h-5 font-bold animate-bounce"
+      strokeWidth={3}
+      color="white"
+    />
+  </button>
+)}
 
-        {showScrollTop && (
-          <button
-            onClick={scrollToTop}
-            className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white p-3 rounded-lg shadow-lg transition transform hover:scale-110 z-50"
-            aria-label="Subir"
-          >
-            <ArrowUp className="w-6 h-6 animate-bounce" />
-          </button>
-        )}
+
+
+
+
+
+
 
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       </div>

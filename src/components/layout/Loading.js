@@ -1,7 +1,7 @@
 const Loading = () => (
-  <div className="flex items-center justify-center min-h-screen bg-black text-white font-sans">
+  <div className="fixed inset-0 flex items-center justify-center bg-white text-black font-sans z-50">
     <svg
-      className="w-10 h-10 text-blue-500 animate-spin"
+      className="w-12 h-12 text-black animate-spin"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -24,3 +24,4 @@ const Loading = () => (
 );
 
 export default Loading;
+

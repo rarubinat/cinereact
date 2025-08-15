@@ -12,7 +12,7 @@ const EditProfile = ({ setPage }) => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [submitted, setSubmitted] = useState(false); // controla el mensaje de error
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -27,11 +27,9 @@ const EditProfile = ({ setPage }) => {
               birthdate: data.birthdate || "",
               gender: data.gender || "",
             });
-          } else {
-            console.warn("User profile not found."); // solo en consola
           }
         } catch (err) {
-          console.error("User profile not found.", err); // solo en consola
+          console.error("User profile not found.", err);
         }
       }
       setLoading(false);
@@ -66,7 +64,7 @@ const EditProfile = ({ setPage }) => {
         phone: form.phone,
         birthdate: form.birthdate,
         gender: form.gender,
-        updatedAt: new Date(), // Alternativa a serverTimestamp
+        updatedAt: new Date(),
       });
 
       alert("Profile updated successfully.");
@@ -77,18 +75,16 @@ const EditProfile = ({ setPage }) => {
     }
   };
 
- return (
-    <div className="min-h-screen bg-zinc-950 text-white px-6 py-10">
+  return (
+    <div className="min-h-screen bg-[#fdfcfb] text-black px-6 py-10">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-zinc-900 rounded-xl p-8 shadow-xl border border-zinc-700"
+        className="w-full max-w-md mx-auto bg-white p-8 rounded-2xl shadow-md border border-gray-200"
       >
-        <h2 className="text-2xl font-semibold text-blue-400 mb-8 tracking-wide">
-          Edit Profile
-        </h2>
+        <h2 className="text-2xl font-bold mb-8 tracking-wide">Edit Profile</h2>
 
         {/* Name */}
-        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+        <label className="block mb-2 text-sm font-medium text-gray-700">
           Full Name
         </label>
         <input
@@ -98,11 +94,11 @@ const EditProfile = ({ setPage }) => {
           onChange={handleChange}
           required
           placeholder="Your full name"
-          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="w-full mb-6 px-4 py-3 rounded-xl bg-white border border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition"
         />
 
         {/* Phone */}
-        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+        <label className="block mb-2 text-sm font-medium text-gray-700">
           Phone (optional)
         </label>
         <input
@@ -112,11 +108,11 @@ const EditProfile = ({ setPage }) => {
           onChange={handleChange}
           pattern="\d*"
           placeholder="Numbers only"
-          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="w-full mb-6 px-4 py-3 rounded-xl bg-white border border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition"
         />
 
         {/* Birthdate */}
-        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+        <label className="block mb-2 text-sm font-medium text-gray-700">
           Birthdate
         </label>
         <input
@@ -125,20 +121,20 @@ const EditProfile = ({ setPage }) => {
           value={form.birthdate}
           onChange={handleChange}
           required
-          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="w-full mb-6 px-4 py-3 rounded-xl bg-white border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-black transition"
         />
 
         {/* Gender */}
-        <label className="block mb-2 text-sm font-semibold text-zinc-300">
+        <label className="block mb-2 text-sm font-medium text-gray-700">
           Gender
         </label>
         <select
           name="gender"
           value={form.gender}
           onChange={handleChange}
-          className="w-full mb-6 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="w-full mb-6 px-4 py-3 rounded-xl bg-white border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-black transition"
         >
-          <option value="" className="text-zinc-400">
+          <option value="" className="text-gray-400">
             Select gender
           </option>
           <option value="Male">Male</option>
@@ -147,11 +143,13 @@ const EditProfile = ({ setPage }) => {
           <option value="Prefer not to say">Prefer not to say</option>
         </select>
 
-       
+        {error && (
+          <p className="text-red-600 text-sm mb-4">{error}</p>
+        )}
 
         <button
           type="submit"
-          className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold shadow-md transition-transform active:scale-95"
+          className="w-full py-3 bg-black hover:bg-gray-800 rounded-full text-white font-semibold shadow-md transition-transform active:scale-95"
         >
           Save Changes
         </button>

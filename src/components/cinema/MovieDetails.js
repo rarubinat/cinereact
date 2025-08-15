@@ -1,4 +1,4 @@
-import { useState } from "react"; 
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import moviesData from "../../data/moviesData";
 import DateBlock from "../cinema/blocks/DateBlock";
@@ -19,8 +19,8 @@ const MovieDetails = () => {
 
   if (!movie) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-zinc-950 text-white p-6">
-        <p className="text-xl">Movie not found.</p>
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-800 p-6">
+        <p className="text-xl font-semibold">Movie not found.</p>
       </div>
     );
   }
@@ -43,13 +43,13 @@ const MovieDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white p-8 max-w-6xl mx-auto relative">
-      {/* Styled alert */}
+    <div className="min-h-screen bg-white text-gray-900 p-8 max-w-5xl mx-auto relative">
+      {/* Alert */}
       {alert.visible && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-50">
-          <div className="flex items-center gap-3 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-xl border border-blue-400 animate-fade-in">
+          <div className="flex items-center gap-3 bg-red-100 text-red-800 px-4 py-3 rounded-lg shadow-md border border-red-300">
             <svg
-              className="w-6 h-6 text-white shrink-0"
+              className="w-5 h-5 shrink-0"
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
@@ -66,12 +66,12 @@ const MovieDetails = () => {
         </div>
       )}
 
-      <h1 className="text-5xl font-extrabold text-blue-500 mb-10 tracking-wide">
-        {title}
-      </h1>
+      {/* Title */}
+      <h1 className="text-4xl font-bold mb-8">{title}</h1>
 
       <div className="flex flex-col md:flex-row gap-10">
-        <div className="md:w-1/3 rounded-lg overflow-hidden shadow-lg">
+        {/* Poster */}
+        <div className="md:w-1/3 rounded-lg overflow-hidden shadow-md">
           <img
             src={movie.image}
             alt={title}
@@ -79,47 +79,52 @@ const MovieDetails = () => {
           />
         </div>
 
-        <div className="md:w-2/3 space-y-6">
-          <p className="text-zinc-300 text-lg leading-relaxed">{movie.sinopsis}</p>
+        {/* Details */}
+        <div className="md:w-2/3 space-y-8">
+          <p className="text-gray-700 leading-relaxed">{movie.sinopsis}</p>
 
-          <div className="my-6">
-            <DateBlock
-              selectedDate={selectedDate}
-              handleDateChange={(date) => {
-                setSelectedDate(date);
-                setSelectedTime("");
-              }}
-            />
-          </div>
+          {/* Date selector */}
+          <DateBlock
+            selectedDate={selectedDate}
+            handleDateChange={(date) => {
+              setSelectedDate(date);
+              setSelectedTime("");
+            }}
+          />
 
+          {/* Time selector */}
           {selectedDate && (
-            <div className="my-6">
-              <h2 className="text-3xl font-bold mb-4 text-blue-500">
+            <div>
+              <h2 className="text-2xl font-semibold mb-4">
                 Rooms and Showtimes for {selectedDate}
               </h2>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3">
                 {showtimesForDate.length > 0 ? (
                   showtimesForDate.map(({ time, room }, index) => (
-                    <div
+                    <button
                       key={index}
-                      className={`bg-blue-800 bg-opacity-60 rounded-lg px-5 py-3 shadow-md cursor-pointer transition ${
-                        selectedTime === time ? "border-4 border-blue-400" : ""
+                      className={`px-5 py-3 rounded-lg border transition font-medium ${
+                        selectedTime === time
+                          ? "bg-black text-white border-black"
+                          : "bg-white border-gray-300 text-gray-800 hover:bg-gray-100"
                       }`}
                       onClick={() => setSelectedTime(time)}
                     >
-                      <p className="text-white font-semibold">Room {room}</p>
-                      <p className="text-blue-300">{time}</p>
-                    </div>
+                      {time} - ROOM {room}
+                    </button>
                   ))
                 ) : (
-                  <p>No showtimes available for this date.</p>
+                  <p className="text-gray-500">
+                    No showtimes available for this date.
+                  </p>
                 )}
               </div>
             </div>
           )}
 
+          {/* Selection info */}
           {selectedDate && selectedTime && (
-            <div className="mt-4 p-4 bg-blue-800 rounded text-white">
+            <div className="mt-4 p-4 bg-gray-50 border rounded-lg">
               <p>
                 Selected: <strong>{selectedDate}</strong> at{" "}
                 <strong>{selectedTime}</strong>
@@ -131,11 +136,12 @@ const MovieDetails = () => {
             </div>
           )}
 
+          {/* Reserve button */}
           <button
-            className="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-semibold disabled:opacity-50"
+            className="w-full mt-6 bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-full font-semibold transition"
             onClick={handleReserve}
           >
-            Reserve
+            Continue
           </button>
         </div>
       </div>

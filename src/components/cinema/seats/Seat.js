@@ -37,18 +37,25 @@ const Seat = ({ seatno, onSeatSelected, selectedMovie, selectedTime, selectedDat
   }, [seatno, selectedMovie, selectedTime, selectedDate]);
 
   const seatClasses = `
-    flex items-center justify-center rounded-t-full
-    text-[10px] sm:text-xs font-bold shadow-md
-    w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 
-    transition-transform duration-200
-    ${isRegistered ? 'bg-red-700 opacity-70 cursor-not-allowed' :
-      isSelected ? 'bg-blue-600 text-white scale-110' :
-      'bg-gray-400 hover:bg-blue-400 hover:scale-105 cursor-pointer'}
+    flex items-center justify-center
+    w-5 h-5 sm:w-6 sm:h-6
+    text-[9px] sm:text-[10px] font-medium
+    rounded-sm
+    transition-colors transition-transform duration-150
+    ${isRegistered
+      ? 'bg-gray-200 cursor-not-allowed'
+      : isSelected
+        ? 'bg-gray-800 text-white scale-105'
+        : 'bg-gray-300 hover:bg-gray-800 hover:text-white hover:scale-105 cursor-pointer'}
   `;
 
   return (
-    <div className="p-1">
-      <div className={seatClasses} onClick={seatClickHandler} style={isRegistered ? { pointerEvents: 'none' } : {}}>
+    <div className="p-[2px]">
+      <div
+        className={seatClasses}
+        onClick={seatClickHandler}
+        style={isRegistered ? { pointerEvents: 'none' } : {}}
+      >
         {isSelected && seatno}
       </div>
     </div>

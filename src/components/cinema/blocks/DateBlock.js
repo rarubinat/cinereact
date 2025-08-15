@@ -12,9 +12,9 @@ const DateTimeline = ({ selectedDate, handleDateChange }) => {
     return {
       date: formatDate(day),
       label: day.toLocaleDateString("en-US", {
-        weekday: "short", // Example: Mon, Tue
-        day: "numeric",   // Day of the month
-        month: "short",   // Month abbreviation
+        weekday: "short",
+        day: "numeric",
+        month: "short",
       }),
     };
   });
@@ -33,31 +33,29 @@ const DateTimeline = ({ selectedDate, handleDateChange }) => {
   const visibleDays = days.slice(scrollIndex, scrollIndex + visibleCount);
 
   return (
-    <div className="flex items-center space-x-3 w-full max-w-screen-md mx-auto px-3">
+    <div className="flex items-center gap-3 w-full max-w-screen-md mx-auto px-3">
       {/* Left arrow */}
       <button
         onClick={() => handleScroll("left")}
         disabled={scrollIndex === 0}
-        className={`p-3 text-blue-300 bg-zinc-800/90 rounded-lg shadow-md transition hover:bg-blue-600 hover:text-white
-          ${scrollIndex === 0 ? "opacity-30 cursor-not-allowed" : ""}`}
+        className={`p-2 rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition ${
+          scrollIndex === 0 ? "opacity-30 cursor-not-allowed" : ""
+        }`}
       >
-        <FaChevronLeft className="text-lg" />
+        <FaChevronLeft />
       </button>
 
       {/* Visible days */}
-      <div className="flex flex-grow space-x-3">
+      <div className="flex flex-grow gap-3">
         {visibleDays.map((day) => (
           <button
             key={day.date}
             onClick={() => handleDateChange(day.date)}
-            className={`
-              flex-grow text-center px-4 py-4 rounded-lg text-base font-semibold transition-all duration-300
-              ${
-                selectedDate === day.date
-                  ? "bg-blue-600 text-white shadow-lg scale-105"
-                  : "bg-zinc-800 text-blue-400 hover:bg-blue-600 hover:text-white hover:scale-105"
-              }
-            `}
+            className={`flex-grow text-center px-4 py-3 rounded-lg border transition font-medium ${
+              selectedDate === day.date
+                ? "bg-black text-white border-black"
+                : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+            }`}
           >
             {day.label}
           </button>
@@ -68,10 +66,11 @@ const DateTimeline = ({ selectedDate, handleDateChange }) => {
       <button
         onClick={() => handleScroll("right")}
         disabled={scrollIndex >= maxIndex}
-        className={`p-3 text-blue-300 bg-zinc-800/90 rounded-lg shadow-md transition hover:bg-blue-600 hover:text-white
-          ${scrollIndex >= maxIndex ? "opacity-30 cursor-not-allowed" : ""}`}
+        className={`p-2 rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition ${
+          scrollIndex >= maxIndex ? "opacity-30 cursor-not-allowed" : ""
+        }`}
       >
-        <FaChevronRight className="text-lg" />
+        <FaChevronRight />
       </button>
     </div>
   );
