@@ -1,137 +1,258 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Film, Star, Armchair, Palette, Car, Volume2 } from "lucide-react";
+import React, { useState } from "react";
 import moviesData from "../data/moviesData";
+import { useNavigate } from "react-router-dom";
+import {
+  Popcorn,
+  Film,
+  Headphones,
+  CreditCard,
+  Star,
+  Users,
+  Newspaper,
+} from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
-  const featuredMovies = Object.entries(moviesData).slice(0, 4);
+  const nowPlaying = Object.entries(moviesData).slice(0, 8);
+  const comingSoon = Object.entries(moviesData).slice(8, 12);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const slidesToShow = 4;
+  const maxIndex = nowPlaying.length - slidesToShow;
+
+  const next = () =>
+    setCurrentIndex(currentIndex < maxIndex ? currentIndex + 1 : 0);
+  const prev = () =>
+    setCurrentIndex(currentIndex > 0 ? currentIndex - 1 : maxIndex);
 
   return (
-    <div className="bg-[#FAF9F6] text-black font-sans">
-      
-      {/* HERO CON BACKGROUND */}
-      <section
-        className="relative min-h-[70vh] w-full bg-cover bg-center flex items-center justify-center"
-        style={{
-          backgroundImage:
-            "url('https://rubik-audiovisual.com/wp-content/uploads/2024/07/Cinesa_sala-XL-copia.jpg')",
-        }}
-      >
-        {/* Overlay suave para que el texto sea legible */}
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="relative z-10 text-center max-w-3xl px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white drop-shadow">
-            Welcome to CineReact
-          </h1>
-          <p className="text-lg md:text-xl max-w-xl mx-auto mb-8 text-gray-100">
-            Experience cinema with exclusive premieres, premium experiences, and the best movie selection.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              to="/films"
-              className="px-6 py-3 bg-black text-white rounded-full font-medium hover:opacity-90 transition"
-            >
-              View Movies
-            </Link>
-            <Link
-              to="/login"
-              className="px-6 py-3 bg-gray-800 text-white rounded-full font-medium hover:opacity-90 transition"
-            >
-              Log In
-            </Link>
+    <div className="bg-white text-black font-sans">
+      <main className="container mx-auto px-6 md:px-12">
+
+        {/* HERO */}
+        <section className="hero py-16 flex flex-col md:flex-row items-center gap-10">
+          <div className="flex-1">
+            <h1 className="text-5xl font-extrabold mb-4 leading-tight">
+              Live the cinema experience <br /> like never before
+            </h1>
+            <p className="mb-6 text-lg text-gray-600 max-w-xl">
+              Always updated movie listings, premium auditoriums and a loyalty
+              program designed for you and your company.
+            </p>
+            <div className="flex gap-4">
+              <a
+                href="#showtimes"
+                className="bg-black text-white px-6 py-3 rounded-full font-medium hover:opacity-80"
+              >
+                Buy Tickets
+              </a>
+              <a
+                href="#memberships"
+                className="border border-black px-6 py-3 rounded-full font-medium hover:bg-black hover:text-white"
+              >
+                Join Cinema Club
+              </a>
+            </div>
           </div>
-        </div>
-      </section>
+          <div className="poster-hero flex justify-center items-center">
+            <Film size={160} strokeWidth={1} className="text-gray-800" />
+          </div>
+        </section>
 
-      {/* ABOUT */}
-      <section className="px-6 md:px-16 lg:px-24 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-4">Discover CineReact</h2>
-        <p className="text-gray-600 max-w-3xl mx-auto mb-6">
-          CineReact is not just a cinema, it's a cinematic experience from another dimension.
-          Designed with cutting-edge technology and a futuristic atmosphere, every screening becomes an immersive journey.
-        </p>
-        <Link
-          to="/about"
-          className="px-6 py-3 bg-black text-white rounded-full font-medium hover:opacity-90 transition"
-        >
-          Learn More
-        </Link>
-      </section>
-
-      {/* FEATURES */}
-      <section className="px-6 md:px-16 lg:px-24 py-16">
-        <h2 className="text-3xl font-bold mb-10 text-center">Why Choose CineReact?</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {[
-            { icon: <Film className="w-6 h-6" />, label: "Original Version Cinema", description: "Premieres in V.O.S.E. so you can enjoy every detail as intended by its creators." },
-            { icon: <Star className="w-6 h-6" />, label: "Premium Theaters", description: "4K laser projection, giant screens, and architecture designed for maximum immersion." },
-            { icon: <Armchair className="w-6 h-6" />, label: "Reclining Seats", description: "Ergonomic chairs with more space and comfort, as if you were in first class." },
-            { icon: <Palette className="w-6 h-6" />, label: "Cyberpunk Design", description: "Futuristic environments with LED lights and aesthetics inspired by the Cyberpunk universe." },
-            { icon: <Car className="w-6 h-6" />, label: "Free Parking", description: "Private, free, and secured parking for a more convenient experience." },
-            { icon: <Volume2 className="w-6 h-6" />, label: "Dolby ATMOS", description: "360° immersive sound with unmatched precision that pulls you into every scene." },
-          ].map((item, index) => (
-            <div
-              key={index}
-              className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 text-center"
+        {/* NOW PLAYING */}
+        <section id="now-playing" className="py-12">
+          <h2 className="text-3xl font-bold mb-6">Now Playing</h2>
+          <div className="relative">
+            <button
+              onClick={prev}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-black text-white p-2 rounded-full z-10 hover:opacity-80"
             >
-              <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center rounded-full bg-gray-100 text-black">
-                {item.icon}
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{item.label}</h3>
-              <p className="text-sm text-gray-600">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section className="px-6 md:px-12 py-20 text-center bg-gray-100">
-        <h2 className="text-3xl font-bold mb-4">Book Your Next Movie</h2>
-        <p className="text-gray-600 max-w-xl mx-auto mb-6">
-          Don’t miss the hottest premieres. Book your ticket and enjoy a unique experience.
-        </p>
-        <Link
-          to="/films"
-          className="px-6 py-3 bg-black text-white rounded-full font-medium hover:opacity-90 transition"
-        >
-          Explore Movies
-        </Link>
-      </section>
-
-      {/* FEATURED MOVIES */}
-      <section className="px-6 md:px-12 py-16">
-        <h2 className="text-2xl font-bold mb-6">Now Playing</h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {featuredMovies.map(([title, data], index) => (
-            <div
-              key={title}
-              className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition"
+              ‹
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-black text-white p-2 rounded-full z-10 hover:opacity-80"
             >
-              <img
-                src={data.image}
-                alt={title}
-                className="w-full h-56 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">{title}</h3>
-                <p className="text-sm text-gray-500">{data.genre}</p>
-                <button
-                  onClick={() => navigate(`/movie/${encodeURIComponent(title)}`)}
-                  className="mt-3 block w-full bg-black text-white py-2 rounded-full hover:opacity-90 transition"
-                >
-                  View More
-                </button>
+              ›
+            </button>
+
+            <div className="overflow-hidden">
+              <div
+                className="flex transition-transform duration-500"
+                style={{
+                  transform: `translateX(-${
+                    (100 / slidesToShow) * currentIndex
+                  }%)`,
+                }}
+              >
+                {nowPlaying.map(([title, data]) => (
+                  <div key={title} className="flex-shrink-0 w-1/4 px-2">
+                    <div className="rounded-xl overflow-hidden shadow-md hover:shadow-lg border border-gray-200">
+                      <img
+                        src={data.image}
+                        alt={title}
+                        className="w-full object-cover"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-        <div className="flex justify-center mt-8">
-          <button className="bg-black text-white px-6 py-3 rounded-full font-medium hover:opacity-90">
-            View Showtimes
-          </button>
-        </div>
-      </section>
+          </div>
+          <div className="cta-center mt-6 text-center" id="showtimes">
+            <button className="bg-black text-white px-8 py-3 rounded-full font-medium hover:opacity-90">
+              View Showtimes
+            </button>
+          </div>
+        </section>
+
+        {/* COMING SOON */}
+        <section className="py-12">
+          <h2 className="text-3xl font-bold mb-6">Coming Soon</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {comingSoon.map(([title, data]) => (
+              <div
+                key={title}
+                className="rounded-xl overflow-hidden border border-gray-200 shadow-sm"
+              >
+                <div className="bg-gray-100 h-60 flex items-center justify-center">
+                  <span className="text-gray-600">{title}</span>
+                </div>
+                <div className="p-4 text-center">
+                  <h3 className="font-semibold">{title}</h3>
+                  <p className="text-gray-500 text-sm">{data.releaseDate}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* BENEFITS */}
+        <section className="py-12">
+          <h2 className="text-3xl font-bold mb-6">Benefits & Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <article className="p-6 text-center border rounded-lg hover:shadow-md">
+              <Popcorn className="w-10 h-10 mx-auto mb-3 text-black" />
+              <h4 className="font-semibold">Gourmet Snacks</h4>
+              <p className="text-gray-600 text-sm">
+                Exclusive recipes and healthy options.
+              </p>
+            </article>
+            <article className="p-6 text-center border rounded-lg hover:shadow-md">
+              <Film className="w-10 h-10 mx-auto mb-3 text-black" />
+              <h4 className="font-semibold">Premium Auditoriums</h4>
+              <p className="text-gray-600 text-sm">
+                Reclining seats and laser projection.
+              </p>
+            </article>
+            <article className="p-6 text-center border rounded-lg hover:shadow-md">
+              <Headphones className="w-10 h-10 mx-auto mb-3 text-black" />
+              <h4 className="font-semibold">Dolby Atmos</h4>
+              <p className="text-gray-600 text-sm">
+                Next-generation immersive sound.
+              </p>
+            </article>
+            <article className="p-6 text-center border rounded-lg hover:shadow-md">
+              <CreditCard className="w-10 h-10 mx-auto mb-3 text-black" />
+              <h4 className="font-semibold">Cinema Club</h4>
+              <p className="text-gray-600 text-sm">
+                Points, rewards and exclusive presales.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        {/* MEMBERSHIPS */}
+        <section id="memberships" className="py-12">
+          <h2 className="text-3xl font-bold mb-6">Memberships</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 border rounded-lg text-center hover:shadow-md">
+              <h3 className="font-bold text-xl mb-2">Basic</h3>
+              <p className="text-gray-600 mb-4">Standard access to benefits</p>
+              <p className="text-2xl font-bold mb-4">$9.99/month</p>
+              <button className="bg-black text-white px-6 py-2 rounded-full hover:opacity-90">
+                Subscribe
+              </button>
+            </div>
+            <div className="p-6 border rounded-lg text-center shadow-lg border-black">
+              <h3 className="font-bold text-xl mb-2">Premium</h3>
+              <p className="text-gray-600 mb-4">
+                Unlimited tickets and early access
+              </p>
+              <p className="text-2xl font-bold mb-4">$19.99/month</p>
+              <button className="bg-black text-white px-6 py-2 rounded-full hover:opacity-90">
+                Subscribe
+              </button>
+            </div>
+            <div className="p-6 border rounded-lg text-center hover:shadow-md">
+              <h3 className="font-bold text-xl mb-2">Corporate</h3>
+              <p className="text-gray-600 mb-4">
+                Exclusive benefits for companies
+              </p>
+              <p className="text-2xl font-bold mb-4">Contact us</p>
+              <button className="bg-black text-white px-6 py-2 rounded-full hover:opacity-90">
+                Contact
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIALS */}
+        <section className="py-12">
+          <h2 className="text-3xl font-bold mb-6">What our customers say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 border rounded-lg shadow-sm">
+              <Star className="w-6 h-6 text-black mb-3" />
+              <p className="text-gray-600 mb-4">
+                "An amazing experience, premium rooms are the best."
+              </p>
+              <p className="font-semibold">Laura G.</p>
+            </div>
+            <div className="p-6 border rounded-lg shadow-sm">
+              <Users className="w-6 h-6 text-black mb-3" />
+              <p className="text-gray-600 mb-4">
+                "Perfect to go out with friends, the loyalty program is very useful."
+              </p>
+              <p className="font-semibold">Carlos M.</p>
+            </div>
+            <div className="p-6 border rounded-lg shadow-sm">
+              <Film className="w-6 h-6 text-black mb-3" />
+              <p className="text-gray-600 mb-4">
+                "Definitely the best cinema in town."
+              </p>
+              <p className="font-semibold">Ana P.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* NEWS */}
+        <section className="py-12">
+          <h2 className="text-3xl font-bold mb-6">News & Updates</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 border rounded-lg hover:shadow-md">
+              <Newspaper className="w-8 h-8 text-black mb-3" />
+              <h3 className="font-semibold mb-2">New IMAX Auditorium</h3>
+              <p className="text-gray-600 text-sm">
+                We inaugurated a new IMAX room with laser projection technology.
+              </p>
+            </div>
+            <div className="p-6 border rounded-lg hover:shadow-md">
+              <Newspaper className="w-8 h-8 text-black mb-3" />
+              <h3 className="font-semibold mb-2">Corporate Partnership</h3>
+              <p className="text-gray-600 text-sm">
+                Exclusive discounts for affiliated companies.
+              </p>
+            </div>
+            <div className="p-6 border rounded-lg hover:shadow-md">
+              <Newspaper className="w-8 h-8 text-black mb-3" />
+              <h3 className="font-semibold mb-2">Film Festival</h3>
+              <p className="text-gray-600 text-sm">
+                Our annual festival with exclusive premieres is coming soon.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 };
