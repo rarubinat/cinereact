@@ -54,23 +54,25 @@ const SeatMatrix = ({ onSeatSelection, selectedMovie, selectedTime, selectedDate
   return (
     <div className="rounded-xl p-6 max-w-lg mx-auto">
       {/* Leyenda */}
-      <h2 className="font-semibold text-lg">Screen</h2>
       <div className="flex items-center gap-4 mt-2 text-sm text-gray-700">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-gray-300 rounded"></div> Available
+          <div className="w-3 h-3 bg-gray-500 rounded"></div> Available
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-gray-800 rounded"></div> Selected
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-gray-500 rounded"></div> Unavailable
+          <div className="w-3 h-3 bg-gray-300 rounded"></div> Unavailable
         </div>
       </div>
 
-      {/* Pantalla curva */}
-      <div className="mt-4">
-        <div className="screen-shape items-center">screen</div>
+     {/* Pantalla curva */}
+    <div className="mt-4 flex justify-center">
+      <div className="screen-shape text-center text-sm">
+        screen
       </div>
+    </div>
+
 
       {/* Asientos */}
       <div className="mt-4 flex flex-col items-center">

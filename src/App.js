@@ -13,10 +13,15 @@ import Home from "./components/Home";
 import Films from "./components/cinema/Films";
 import MovieDetails from "./components/cinema/MovieDetails";
 import ReserveMovie from "./components/layout/ReserveMovie";
+import SnacksPage from "./components/hooks/SnacksPage";
 import Payment from "./components/hooks/Payment";
+
+import Promotions from "./components/layout/Promotions";
+import Fidelity from "./components/layout/Fidelity";
 
 import AuthModal from "./components/auth/AuthModal";
 import Register from "./components/auth/Register";
+
 
 // ✅ Componente con loading visual separado
 const RoutesWithLoading = () => {
@@ -39,9 +44,14 @@ const RoutesWithLoading = () => {
       <Route path="/films" element={<Films />} />
       <Route path="/movie/:title" element={<MovieDetails />} />
       <Route path="/reservemovie" element={<ReserveMovie />} />
+      <Route path="/snackspage" element={<SnacksPage />} />
+      
       <Route path="/payment" element={<Payment />} />
       <Route path="/view-reservations" element={<ViewReserve />} />
       <Route path="/edit-profile" element={<EditProfile />} />
+
+      <Route path="/promotions" element={<Promotions />} />
+      <Route path="/fidelity" element={<Fidelity />} />
     </Routes>
   );
 };

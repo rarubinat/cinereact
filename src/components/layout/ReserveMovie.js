@@ -32,29 +32,29 @@ const ReserveMovie = () => {
     setSelectedSeats(seats);
   };
 
-  const handleGoToPayment = () => {
+  const handleGoToSnacks = () => {
     if (!selectedSeats.length) {
       showAlert("Please select at least one seat.");
       return;
     }
 
-    navigate("/payment", {
+    navigate("/SnacksPage", {
       state: {
         selectedMovie,
         selectedDate,
         selectedTime,
         selectedSeats,
         room,
-        totalPrice,
-        image: movie.image
-      }
+        moviePrice,
+        image: movie.image,
+      },
     });
   };
 
   if (!movie) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-800 p-6">
-        <p className="text-xl font-semibold">Not found.</p>
+      <div className="flex items-center justify-center min-h-screen text-gray-800 p-6">
+        <h3 className="text-3xl font-bold text-black mb-6">Not found.</h3>
       </div>
     );
   }
@@ -85,19 +85,11 @@ const ReserveMovie = () => {
 
       <h1 className="text-4xl font-bold mb-8">{selectedMovie}</h1>
 
-      <div className="flex flex-col md:flex-row gap-10">
-        {/* Poster */}
-        <div className="md:w-1/3 rounded-lg overflow-hidden shadow-md">
-          <img
-            src={movie.image}
-            alt={selectedMovie}
-            className="w-full h-auto object-cover"
-          />
-        </div>
-
-        {/* Details + Seats */}
-        <div className="md:w-2/3 space-y-8">
-          <div className="p-4 bg-gray-50 border rounded-lg space-y-2">
+      <div className="space-y-8">
+        {/* Datos + Poster */}
+        <div className="p-4 bg-gray-50 border rounded-lg flex items-start justify-between gap-6">
+          {/* Datos */}
+          <div className="space-y-2 flex-1">
             <p>
               <strong>Film:</strong> {selectedMovie}
             </p>
@@ -112,37 +104,46 @@ const ReserveMovie = () => {
             </p>
           </div>
 
-          {/* Seat selector */}
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Select your seats</h2>
-            <SeatMatrix
-              onSeatSelection={handleSeatSelection}
-              selectedMovie={selectedMovie}
-              selectedTime={selectedTime}
-              selectedDate={selectedDate}
-              savedReservations={[]}
-              room={room}
+          {/* Poster */}
+          <div className="w-32 h-48 rounded-lg overflow-hidden shadow-md shrink-0">
+            <img
+              src={movie.image}
+              alt={selectedMovie}
+              className="w-full h-full object-cover"
             />
           </div>
-
-          {/* Summary */}
-          {selectedSeats.length > 0 && (
-            <div className="mt-6 p-4 bg-gray-50 border rounded-lg space-y-4">
-              <p>
-                <strong>Seats selected:</strong> {selectedSeats.join(", ")}
-              </p>
-              <p>
-                <strong>Price:</strong> {totalPrice.toFixed(2)} €
-              </p>
-              <button
-                onClick={handleGoToPayment}
-                className="w-full py-3 px-6 rounded-full font-semibold text-white bg-black hover:bg-gray-800 transition"
-              >
-                Proceed to Payment
-              </button>
-            </div>
-          )}
         </div>
+
+        {/* Seat selector */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Select your seats</h2>
+          <SeatMatrix
+            onSeatSelection={handleSeatSelection}
+            selectedMovie={selectedMovie}
+            selectedTime={selectedTime}
+            selectedDate={selectedDate}
+            savedReservations={[]}
+            room={room}
+          />
+        </div>
+
+        {/* Summary */}
+        {selectedSeats.length > 0 && (
+          <div className="mt-6 p-4 bg-gray-50 border rounded-lg space-y-4">
+            <p>
+              <strong>Seats selected:</strong> {selectedSeats.join(", ")}
+            </p>
+            <p>
+              <strong>Price:</strong> {totalPrice.toFixed(2)} €
+            </p>
+            <button
+              onClick={handleGoToSnacks}
+              className="w-full py-3 px-6 rounded-full font-semibold text-white bg-black hover:bg-gray-800 transition"
+            >
+              Continue to Snacks
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

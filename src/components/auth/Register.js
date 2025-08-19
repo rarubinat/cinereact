@@ -59,12 +59,15 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
 
     try {
       const { user } = await auth.createUserWithEmailAndPassword(email, password);
+
+      // Guardar usuario en Firestore con plan Silver
       await db.collection("users").doc(user.uid).set({
         name,
         email,
         phone,
         birthdate,
         gender,
+        plan: "Silver", // <- Plan inicial
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
@@ -181,8 +184,7 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
           {error && (
             <p className="text-red-600 text-center font-medium">{error}</p>
           )}
-          
-         
+
           <button
             type="submit"
             className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition"
@@ -190,7 +192,7 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
             Sign up
           </button>
 
-           <p className="mt-6 text-center text-black">
+          <p className="mt-6 text-center text-black">
             Already have an account?{" "}
             <span
               onClick={() => setPage("Login")}
@@ -199,11 +201,7 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
               Sign in
             </span>
           </p>
-
         </form>
-
-        
-      
       </div>
     </div>
   );

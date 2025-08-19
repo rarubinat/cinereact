@@ -10,21 +10,21 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#002F6C] text-white text-sm py-8 px-6 w-full">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 border-b border-blue-800 pb-6">
+    <footer className="bg-black/90 text-white text-sm py-8 px-6 w-full">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 border-b pb-6">
         
         {/* Logo/Description */}
         <div>
-          <h3 className="font-semibold mb-4 text-[#00A1E4]">CINEMA</h3>
-          <p className="text-blue-200">
+          <h3 className="font-semibold mb-4">CINEMA</h3>
+          <p className="text-white">
             Enjoy the best cinematic experience with us.
           </p>
         </div>
 
         {/* Company Info */}
         <div>
-          <h4 className="font-semibold mb-4 text-[#00A1E4]">Company</h4>
-          <ul className="space-y-2 text-blue-300">
+          <h4 className="font-semibold mb-4">Company</h4>
+          <ul className="space-y-2">
             <li><a href="#" className="hover:text-[#00A1E4]">About Us</a></li>
             <li><a href="#" className="hover:text-[#00A1E4]">Work With Us</a></li>
             <li><a href="#" className="hover:text-[#00A1E4]">Cinema Business</a></li>
@@ -36,8 +36,8 @@ const Footer = () => {
 
         {/* Experiences */}
         <div>
-          <h4 className="font-semibold mb-4 text-[#00A1E4]">Experiences</h4>
-          <ul className="space-y-2 text-blue-300">
+          <h4 className="font-semibold mb-4">Experiences</h4>
+          <ul className="space-y-2">
             <li><a href="#" className="hover:text-[#00A1E4]">Events</a></li>
             <li><a href="#" className="hover:text-[#00A1E4]">Luxury Cinemas</a></li>
             <li><a href="#" className="hover:text-[#00A1E4]">Premium Rooms</a></li>
@@ -49,8 +49,8 @@ const Footer = () => {
 
         {/* Legal */}
         <div>
-          <h4 className="font-semibold mb-4 text-[#00A1E4]">Legal</h4>
-          <ul className="space-y-2 text-blue-300">
+          <h4 className="font-semibold mb-4">Legal</h4>
+          <ul className="space-y-2">
             <li><a href="#" className="hover:text-[#00A1E4]">Legal Notice</a></li>
             <li><a href="#" className="hover:text-[#00A1E4]">Purchase Conditions</a></li>
             <li><a href="#" className="hover:text-[#00A1E4]">Unlimited Card Terms</a></li>
@@ -64,7 +64,7 @@ const Footer = () => {
 
         {/* Apps & Social */}
         <div>
-          <h4 className="font-semibold mb-4 text-[#00A1E4]">Get Our App</h4>
+          <h4 className="font-semibold mb-4">Get Our App</h4>
           <div className="flex space-x-4 mb-6">
             <a href="#" aria-label="Download on App Store" className="hover:text-[#00A1E4] text-2xl">
               <FaApple />
@@ -73,7 +73,7 @@ const Footer = () => {
               <FaGooglePlay />
             </a>
           </div>
-          <h4 className="font-semibold mb-4 text-[#00A1E4]">Follow Us</h4>
+          <h4 className="font-semibold mb-4">Follow Us</h4>
           <div className="flex space-x-4 text-xl text-blue-300">
             <a href="#" aria-label="Facebook" className="hover:text-[#00A1E4]"><FaFacebookF /></a>
             <a href="#" aria-label="Twitter" className="hover:text-[#00A1E4]"><FaTwitter /></a>

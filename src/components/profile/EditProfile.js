@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { auth } from "../../utils/firebase";
 import db from "../../utils/firebase";
 import { FiPhone, FiCalendar, FiUser } from "react-icons/fi";
-import { useNavigate } from "react-router-dom"; 
 
 const EditProfile = ({ setPage }) => {
   const [form, setForm] = useState({
@@ -15,17 +14,21 @@ const EditProfile = ({ setPage }) => {
     notifications: true,
   });
 
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
   const [reservations, setReservations] = useState([]);
+  const [points, setPoints] = useState(0); 
+  const [ticketsThisMonth, setTicketsThisMonth] = useState(0);
+  const [currentPlan, setCurrentPlan] = useState("Standard");
+  const [totalReservations, setTotalReservations] = useState(0);
 
-   const navigate = useNavigate(); // Hook para redirigir
+
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
+          // Obtener datos del usuario
           const userDoc = await db.collection("users").doc(user.uid).get();
           if (userDoc.exists) {
             const data = userDoc.data();
@@ -36,8 +39,11 @@ const EditProfile = ({ setPage }) => {
               birthdate: data.birthdate || "",
               gender: data.gender || "",
             }));
+            setPoints(data.points || 0);
+            setCurrentPlan(data.plan || "Standard");
           }
 
+          // Reservas pasadas (últimas 2 para mostrar)
           const resSnapshot = await db
             .collection("past-reservations")
             .where("userId", "==", user.uid)
@@ -50,11 +56,29 @@ const EditProfile = ({ setPage }) => {
             ...doc.data(),
           }));
           setReservations(pastReservations);
+
+          // Total de reservas
+          const totalSnapshot = await db
+            .collection("past-reservations")
+            .where("userId", "==", user.uid)
+            .get();
+          setTotalReservations(totalSnapshot.size);
+
+          // Tickets de este mes
+          const startOfMonth = new Date();
+          startOfMonth.setDate(1);
+          startOfMonth.setHours(0, 0, 0, 0);
+
+          const tickets = pastReservations.filter(
+            (r) => new Date(r.date) >= startOfMonth
+          ).length;
+
+          setTicketsThisMonth(tickets);
+
         } catch (err) {
           console.error("Error fetching user or reservations", err);
         }
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -86,6 +110,7 @@ const EditProfile = ({ setPage }) => {
         phone: form.phone,
         birthdate: form.birthdate,
         gender: form.gender,
+        plan: currentPlan,
         updatedAt: new Date(),
       });
       alert("Profile updated successfully.");
@@ -96,16 +121,8 @@ const EditProfile = ({ setPage }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p>Loading profile...</p>
-      </div>
-    );
-  }
-
   return (
-    <main className="min-h-screen flex flex-col items-center justify-start p-6 space-y-12 bg-gray-50">
+    <main className="min-h-screen flex flex-col items-center justify-start p-6 space-y-12">
       {/* Profile Section */}
       <section className="profile-header text-center space-y-3 max-w-md w-full">
         <div className="avatar w-24 h-24 mx-auto rounded-full bg-gray-300"></div>
@@ -133,7 +150,6 @@ const EditProfile = ({ setPage }) => {
           )}
         </div>
 
-        {/* Edit Profile Button */}
         {!editing && (
           <button
             className="btn mt-4 px-6 py-2 bg-black text-white rounded-full hover:bg-gray-800"
@@ -143,16 +159,13 @@ const EditProfile = ({ setPage }) => {
           </button>
         )}
 
-        {/* Profile Form */}
         {editing && (
           <form
             onSubmit={handleSubmit}
             className="mt-6 space-y-4 text-left max-w-md mx-auto bg-white p-6 rounded-lg shadow"
           >
             <div>
-              <label htmlFor="name" className="block mb-1 font-medium">
-                Full Name
-              </label>
+              <label htmlFor="name" className="block mb-1 font-medium">Full Name</label>
               <input
                 type="text"
                 id="name"
@@ -164,9 +177,7 @@ const EditProfile = ({ setPage }) => {
               />
             </div>
             <div>
-              <label htmlFor="phone" className="block mb-1 font-medium">
-                Phone
-              </label>
+              <label htmlFor="phone" className="block mb-1 font-medium">Phone</label>
               <input
                 type="text"
                 id="phone"
@@ -178,9 +189,7 @@ const EditProfile = ({ setPage }) => {
               />
             </div>
             <div>
-              <label htmlFor="birthdate" className="block mb-1 font-medium">
-                Birthdate
-              </label>
+              <label htmlFor="birthdate" className="block mb-1 font-medium">Birthdate</label>
               <input
                 type="date"
                 id="birthdate"
@@ -191,9 +200,7 @@ const EditProfile = ({ setPage }) => {
               />
             </div>
             <div>
-              <label htmlFor="gender" className="block mb-1 font-medium">
-                Gender
-              </label>
+              <label htmlFor="gender" className="block mb-1 font-medium">Gender</label>
               <select
                 id="gender"
                 name="gender"
@@ -209,9 +216,7 @@ const EditProfile = ({ setPage }) => {
               </select>
             </div>
             <div>
-              <label htmlFor="language" className="block mb-1 font-medium">
-                Preferred Language
-              </label>
+              <label htmlFor="language" className="block mb-1 font-medium">Preferred Language</label>
               <select
                 id="language"
                 name="language"
@@ -223,10 +228,25 @@ const EditProfile = ({ setPage }) => {
                 <option>Spanish</option>
               </select>
             </div>
+
             <div>
-              <label htmlFor="payment" className="block mb-1 font-medium">
-                Payment Method
-              </label>
+              <label htmlFor="plan" className="block mb-1 font-medium">Membership Plan</label>
+              <select
+                id="plan"
+                name="plan"
+                value={currentPlan}
+                onChange={(e) => setCurrentPlan(e.target.value)}
+                className="w-full p-2 border rounded-lg"
+              >
+                <option value="Standard">Standard</option>
+                <option value="Silver">Silver</option>
+                <option value="Gold">Gold</option>
+                <option value="VIP">VIP</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="payment" className="block mb-1 font-medium">Payment Method</label>
               <input
                 type="text"
                 id="payment"
@@ -260,17 +280,17 @@ const EditProfile = ({ setPage }) => {
       </section>
 
       {/* Summary Section */}
-      <section className="summary grid grid-cols-2 md:grid-cols-4 gap-4 text-center max-w-4xl w-full">
+      <section className="summary grid grid-cols-2 md:grid-cols-5 gap-4 text-center max-w-4xl w-full">
         <div className="card bg-white p-4 rounded-lg shadow">
-          <h3 className="text-xl font-bold">5</h3>
+          <h3 className="text-xl font-bold">{ticketsThisMonth}</h3>
           <p>Tickets this month</p>
         </div>
         <div className="card bg-white p-4 rounded-lg shadow">
-          <h3 className="text-xl font-bold">1200</h3>
+          <h3 className="text-xl font-bold">{points}</h3>
           <p>Points accumulated</p>
         </div>
         <div className="card bg-white p-4 rounded-lg shadow">
-          <h3 className="text-xl font-bold">Family</h3>
+          <h3 className="text-xl font-bold">{currentPlan}</h3>
           <p>Current Plan</p>
         </div>
         <div className="card bg-white p-4 rounded-lg shadow">
@@ -278,6 +298,10 @@ const EditProfile = ({ setPage }) => {
             {reservations[0] ? new Date(reservations[0].date).toLocaleDateString("en-US") : "Aug 18"}
           </h3>
           <p>Next Reservation</p>
+        </div>
+        <div className="card bg-white p-4 rounded-lg shadow">
+          <h3 className="text-xl font-bold">{totalReservations}</h3>
+          <p>Total Reservations</p>
         </div>
       </section>
 
@@ -300,31 +324,7 @@ const EditProfile = ({ setPage }) => {
               </div>
             </div>
           ))}
-        </div>
-         <button
-            onClick={() => navigate("/ViewReserve")}
-            className="btn px-4 py-1 bg-black text-white rounded-full hover:bg-gray-800"
-          >
-            See More
-          </button>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="benefits max-w-4xl w-full text-center">
-        <h2 className="text-xl font-semibold mb-4">Available Benefits</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-items-center">
-          <div className="benefit bg-white p-4 rounded-lg shadow w-full max-w-xs">
-            <h4 className="font-semibold">Free Popcorn</h4>
-            <p>Valid on your next visit.</p>
-          </div>
-          <div className="benefit bg-white p-4 rounded-lg shadow w-full max-w-xs">
-            <h4 className="font-semibold">Exclusive Premiere</h4>
-            <p>Access special premieres.</p>
-          </div>
-          <div className="benefit bg-white p-4 rounded-lg shadow w-full max-w-xs">
-            <h4 className="font-semibold">Early Ticket Sale</h4>
-            <p>Buy tickets before anyone else.</p>
-          </div>
+          {reservations.length === 0 && <p>No past reservations.</p>}
         </div>
       </section>
     </main>

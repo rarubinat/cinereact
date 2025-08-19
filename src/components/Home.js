@@ -13,8 +13,12 @@ import {
 
 const Home = () => {
   const navigate = useNavigate();
-  const nowPlaying = Object.entries(moviesData).slice(0, 8);
-  const comingSoon = Object.entries(moviesData).slice(8, 12);
+  const nowPlaying = Object.entries(moviesData).filter(
+    ([, data]) => data.category === "NOW_SHOWING"
+  );
+  const comingSoon = Object.entries(moviesData).filter(
+    ([, data]) => data.category === "COMING_SOON"
+  );
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const slidesToShow = 4;
@@ -24,6 +28,10 @@ const Home = () => {
     setCurrentIndex(currentIndex < maxIndex ? currentIndex + 1 : 0);
   const prev = () =>
     setCurrentIndex(currentIndex > 0 ? currentIndex - 1 : maxIndex);
+
+  const handleNavigate = (title) => {
+    navigate(`/movie/${encodeURIComponent(title)}`);
+  };
 
   return (
     <div className="bg-white text-black font-sans">
@@ -86,8 +94,12 @@ const Home = () => {
                 }}
               >
                 {nowPlaying.map(([title, data]) => (
-                  <div key={title} className="flex-shrink-0 w-1/4 px-2">
-                    <div className="rounded-xl overflow-hidden shadow-md hover:shadow-lg border border-gray-200">
+                  <div
+                    key={title}
+                    className="flex-shrink-0 w-1/4 px-2 cursor-pointer"
+                    onClick={() => handleNavigate(title)}
+                  >
+                    <div className="rounded-xl overflow-hidden shadow-md hover:shadow-lg border border-gray-200 transition">
                       <img
                         src={data.image}
                         alt={title}
@@ -113,10 +125,14 @@ const Home = () => {
             {comingSoon.map(([title, data]) => (
               <div
                 key={title}
-                className="rounded-xl overflow-hidden border border-gray-200 shadow-sm"
+                className="rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition"
               >
-                <div className="bg-gray-100 h-60 flex items-center justify-center">
-                  <span className="text-gray-600">{title}</span>
+                <div className="h-60">
+                  <img
+                    src={data.image}
+                    alt={title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="p-4 text-center">
                   <h3 className="font-semibold">{title}</h3>
