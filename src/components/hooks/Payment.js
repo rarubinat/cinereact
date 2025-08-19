@@ -36,6 +36,14 @@ const Payment = () => {
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [reservationData, setReservationData] = useState(null);
 
+  // Descuentos
+  const availableDiscounts = [
+    { id: 1, name: "10% Off", value: 0.1 },
+    { id: 2, name: "20% Off", value: 0.2 },
+    { id: 3, name: "Student 15% Off", value: 0.15 },
+  ];
+  const [selectedDiscount, setSelectedDiscount] = useState(null);
+
   // Mostrar alerta temporal
   const showAlert = (message) => {
     setAlert({ message, visible: true });
@@ -50,6 +58,13 @@ const Payment = () => {
     value.replace(/\D/g, "").replace(/(\d{2})(\d{1,2})?/, (_, m1, m2) =>
       m2 ? `${m1}/${m2}` : m1
     );
+
+  // Precios con descuento
+  const seatPrice = totalPrice - (foodPrice || 0);
+  const discountedSeatPrice = selectedDiscount
+    ? seatPrice * (1 - selectedDiscount.value)
+    : seatPrice;
+  const discountedTotalPrice = discountedSeatPrice + (foodPrice || 0);
 
   // Manejo del pago
   const handlePayment = async () => {
@@ -70,9 +85,6 @@ const Payment = () => {
       return showAlert("You must be logged in to make a payment.");
     }
 
-    // Calculamos seatPrice por separado
-    const seatPrice = totalPrice - (foodPrice || 0);
-
     const reservation = {
       userId: currentUser.uid,
       email: currentUser.email,
@@ -82,13 +94,14 @@ const Payment = () => {
       selectedSeats,
       room,
       timestamp: new Date(),
-      totalPrice,
-      seatPrice,
+      totalPrice: discountedTotalPrice,
+      seatPrice: discountedSeatPrice,
       foodPrice: foodPrice || 0,
       ticketId: generateTicketId(),
       billingEmail,
       billingCountry,
       snacks: selectedFood || [],
+      appliedDiscount: selectedDiscount || null,
     };
 
     try {
@@ -156,6 +169,12 @@ const Payment = () => {
           {reservationData.foodPrice > 0 && (
             <p>
               <strong>Food Price:</strong> {reservationData.foodPrice.toFixed(2)} €
+            </p>
+          )}
+
+          {reservationData.appliedDiscount && (
+            <p>
+              <strong>Discount:</strong> {reservationData.appliedDiscount.name}
             </p>
           )}
 
@@ -233,7 +252,7 @@ const Payment = () => {
         </p>
 
         <p>
-          <strong>Seat Price:</strong> {(totalPrice - (foodPrice || 0)).toFixed(2)} €
+          <strong>Seat Price:</strong> {discountedSeatPrice.toFixed(2)} €
         </p>
         {foodPrice > 0 && (
           <p>
@@ -241,112 +260,82 @@ const Payment = () => {
           </p>
         )}
 
-        {selectedFood?.length > 0 && (
-          <div>
-            <strong>Snacks:</strong>
-            <ul className="list-disc list-inside">
-              {selectedFood.map((s, index) => (
-                <li key={index}>
-                  {s.name} x{s.quantity} — {(s.price * s.quantity).toFixed(2)} €
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Selector de descuentos */}
+        <div className="mt-4">
+          <label className="block text-sm font-semibold mb-1">Discount</label>
+          <select
+            value={selectedDiscount?.id || ""}
+            onChange={(e) =>
+              setSelectedDiscount(
+                availableDiscounts.find((d) => d.id === parseInt(e.target.value)) ||
+                  null
+              )
+            }
+            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black mb-4"
+          >
+            <option value="">No discount</option>
+            {availableDiscounts.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <p className="mt-2 text-xl font-bold">Total: {totalPrice.toFixed(2)} €</p>
+        <p className="mt-2 text-xl font-bold">
+          Total: {discountedTotalPrice.toFixed(2)} €
+        </p>
       </div>
 
       {/* Formulario de pago */}
-      <div className="bg-white p-6 rounded-xl shadow-md space-y-6">
-        <div className="flex justify-center gap-4 mb-4">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
-            alt="Visa"
-            className="h-6"
-          />
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
-            alt="MasterCard"
-            className="h-6"
-          />
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo_%282018%29.svg"
-            alt="Amex"
-            className="h-6"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold mb-1">Cardholder Name</label>
-          <input
-            type="text"
-            placeholder="e.g. John Doe"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold mb-1">Card Number</label>
-          <input
-            type="text"
-            placeholder="1234 5678 9012 3456"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-            maxLength={19}
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
-          />
-        </div>
-
+      <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Name on Card"
+          className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
+        />
+        <input
+          type="text"
+          value={formatCardNumber(cardNumber)}
+          onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+          placeholder="Card Number"
+          maxLength={19}
+          className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
+        />
         <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-semibold mb-1">Expiry</label>
-            <input
-              type="text"
-              placeholder="MM/YY"
-              value={expiry}
-              onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-              maxLength={5}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
-            />
-          </div>
-
-          <div className="flex-1">
-            <label className="block text-sm font-semibold mb-1">CVV</label>
-            <input
-              type="text"
-              placeholder="123"
-              value={cvv}
-              onChange={(e) => setCvv(e.target.value)}
-              maxLength={4}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold mb-1">Billing Email</label>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={billingEmail}
-            onChange={(e) => setBillingEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold mb-1">Billing Country</label>
           <input
             type="text"
-            placeholder="Spain"
-            value={billingCountry}
-            onChange={(e) => setBillingCountry(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
+            value={formatExpiry(expiry)}
+            onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+            placeholder="MM/YY"
+            maxLength={5}
+            className="w-1/2 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
+          />
+          <input
+            type="text"
+            value={cvv}
+            onChange={(e) => setCvv(e.target.value)}
+            placeholder="CVV"
+            maxLength={4}
+            className="w-1/2 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
           />
         </div>
+        <input
+          type="email"
+          value={billingEmail}
+          onChange={(e) => setBillingEmail(e.target.value)}
+          placeholder="Billing Email"
+          className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
+        />
+        <input
+          type="text"
+          value={billingCountry}
+          onChange={(e) => setBillingCountry(e.target.value)}
+          placeholder="Billing Country"
+          className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black"
+        />
 
         <button
           onClick={handlePayment}
@@ -355,7 +344,7 @@ const Payment = () => {
             loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
           }`}
         >
-          {loading ? "Processing..." : `Pay ${totalPrice.toFixed(2)} €`}
+          {loading ? "Processing..." : `Pay ${discountedTotalPrice.toFixed(2)} €`}
         </button>
       </div>
     </div>

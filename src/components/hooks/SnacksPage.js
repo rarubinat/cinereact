@@ -32,7 +32,7 @@ const SnacksPage = () => {
             price: item.price,
             quantity: 1,
             foodPrice: item.price,
-            QuantitySnack: 1, // inicializamos en 1
+            QuantitySnack: 1,
           },
         ];
       }
@@ -122,6 +122,30 @@ const SnacksPage = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Opción de continuar sin snacks */}
+      <div className="mb-6 text-center">
+        <button
+          onClick={() =>
+            navigate("/Payment", {
+              state: {
+                selectedMovie,
+                selectedDate,
+                selectedTime,
+                selectedSeats,
+                room,
+                image,
+                snacks: [],
+                foodPrice: 0,
+                totalPrice: seatsTotal,
+              },
+            })
+          }
+          className="mt-2 w-full py-3 px-6 rounded-full font-semibold text-white bg-gray-500 hover:bg-gray-600 transition"
+        >
+          No quiero snacks, continuar
+        </button>
       </div>
 
       {/* Order Summary */}

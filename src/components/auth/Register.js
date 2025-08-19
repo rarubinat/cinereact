@@ -60,6 +60,11 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
     try {
       const { user } = await auth.createUserWithEmailAndPassword(email, password);
 
+      // 👇 Actualizar displayName en Auth
+      await user.updateProfile({
+        displayName: name,
+      });
+
       // Guardar usuario en Firestore con plan Silver
       await db.collection("users").doc(user.uid).set({
         name,
@@ -67,7 +72,7 @@ const Register = ({ embedded = false, onSuccess, setPage }) => {
         phone,
         birthdate,
         gender,
-        plan: "Silver", // <- Plan inicial
+        plan: "Silver",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
 

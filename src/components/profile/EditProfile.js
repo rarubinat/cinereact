@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { auth } from "../../utils/firebase";
 import db from "../../utils/firebase";
 import { FiPhone, FiCalendar, FiUser } from "react-icons/fi";
+import useReservationCount from "../hooks/ReservationCount";
 
 const EditProfile = ({ setPage }) => {
   const [form, setForm] = useState({
@@ -17,12 +18,11 @@ const EditProfile = ({ setPage }) => {
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
   const [reservations, setReservations] = useState([]);
-  const [points, setPoints] = useState(0); 
-  const [ticketsThisMonth, setTicketsThisMonth] = useState(0);
-  const [currentPlan, setCurrentPlan] = useState("Standard");
-  const [totalReservations, setTotalReservations] = useState(0);
+  const [currentPlan, setCurrentPlan] = useState("Silver");
 
-
+  // ✅ ahora usamos last30DaysCount en vez de monthlyCount
+  const { totalCount, last30DaysCount, totalPoints, loading } =
+    useReservationCount();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -39,16 +39,17 @@ const EditProfile = ({ setPage }) => {
               birthdate: data.birthdate || "",
               gender: data.gender || "",
             }));
-            setPoints(data.points || 0);
-            setCurrentPlan(data.plan || "Standard");
+
+            // Asignar plan automáticamente en base a puntos (ya calculados en el hook)
+            setCurrentPlan((data.points || 0) > 250 ? "Gold" : "Silver");
           }
 
-          // Reservas pasadas (últimas 2 para mostrar)
+          // ✅ Últimas 30 reservas para historial
           const resSnapshot = await db
-            .collection("past-reservations")
+            .collection("reservas")
             .where("userId", "==", user.uid)
             .orderBy("date", "desc")
-            .limit(2)
+            .limit(30)
             .get();
 
           const pastReservations = resSnapshot.docs.map((doc) => ({
@@ -56,25 +57,6 @@ const EditProfile = ({ setPage }) => {
             ...doc.data(),
           }));
           setReservations(pastReservations);
-
-          // Total de reservas
-          const totalSnapshot = await db
-            .collection("past-reservations")
-            .where("userId", "==", user.uid)
-            .get();
-          setTotalReservations(totalSnapshot.size);
-
-          // Tickets de este mes
-          const startOfMonth = new Date();
-          startOfMonth.setDate(1);
-          startOfMonth.setHours(0, 0, 0, 0);
-
-          const tickets = pastReservations.filter(
-            (r) => new Date(r.date) >= startOfMonth
-          ).length;
-
-          setTicketsThisMonth(tickets);
-
         } catch (err) {
           console.error("Error fetching user or reservations", err);
         }
@@ -105,14 +87,16 @@ const EditProfile = ({ setPage }) => {
         setError("Name cannot be empty.");
         return;
       }
+
       await db.collection("users").doc(user.uid).update({
         name: form.name,
         phone: form.phone,
         birthdate: form.birthdate,
         gender: form.gender,
-        plan: currentPlan,
+        plan: currentPlan, // plan calculado automáticamente
         updatedAt: new Date(),
       });
+
       alert("Profile updated successfully.");
       setEditing(false);
     } catch (err) {
@@ -139,7 +123,9 @@ const EditProfile = ({ setPage }) => {
           {form.birthdate && (
             <div className="flex items-center justify-center space-x-1">
               <FiCalendar />
-              <span>{new Date(form.birthdate).toLocaleDateString("en-US")}</span>
+              <span>
+                {new Date(form.birthdate).toLocaleDateString("en-US")}
+              </span>
             </div>
           )}
           {form.gender && (
@@ -165,7 +151,9 @@ const EditProfile = ({ setPage }) => {
             className="mt-6 space-y-4 text-left max-w-md mx-auto bg-white p-6 rounded-lg shadow"
           >
             <div>
-              <label htmlFor="name" className="block mb-1 font-medium">Full Name</label>
+              <label htmlFor="name" className="block mb-1 font-medium">
+                Full Name
+              </label>
               <input
                 type="text"
                 id="name"
@@ -177,7 +165,9 @@ const EditProfile = ({ setPage }) => {
               />
             </div>
             <div>
-              <label htmlFor="phone" className="block mb-1 font-medium">Phone</label>
+              <label htmlFor="phone" className="block mb-1 font-medium">
+                Phone
+              </label>
               <input
                 type="text"
                 id="phone"
@@ -189,7 +179,9 @@ const EditProfile = ({ setPage }) => {
               />
             </div>
             <div>
-              <label htmlFor="birthdate" className="block mb-1 font-medium">Birthdate</label>
+              <label htmlFor="birthdate" className="block mb-1 font-medium">
+                Birthdate
+              </label>
               <input
                 type="date"
                 id="birthdate"
@@ -200,7 +192,9 @@ const EditProfile = ({ setPage }) => {
               />
             </div>
             <div>
-              <label htmlFor="gender" className="block mb-1 font-medium">Gender</label>
+              <label htmlFor="gender" className="block mb-1 font-medium">
+                Gender
+              </label>
               <select
                 id="gender"
                 name="gender"
@@ -216,7 +210,9 @@ const EditProfile = ({ setPage }) => {
               </select>
             </div>
             <div>
-              <label htmlFor="language" className="block mb-1 font-medium">Preferred Language</label>
+              <label htmlFor="language" className="block mb-1 font-medium">
+                Preferred Language
+              </label>
               <select
                 id="language"
                 name="language"
@@ -229,24 +225,18 @@ const EditProfile = ({ setPage }) => {
               </select>
             </div>
 
+            {/* Plan calculado automáticamente */}
             <div>
-              <label htmlFor="plan" className="block mb-1 font-medium">Membership Plan</label>
-              <select
-                id="plan"
-                name="plan"
-                value={currentPlan}
-                onChange={(e) => setCurrentPlan(e.target.value)}
-                className="w-full p-2 border rounded-lg"
-              >
-                <option value="Standard">Standard</option>
-                <option value="Silver">Silver</option>
-                <option value="Gold">Gold</option>
-                <option value="VIP">VIP</option>
-              </select>
+              <label className="block mb-1 font-medium">Membership Plan</label>
+              <p className="p-2 border rounded-lg bg-gray-100">
+                {currentPlan}
+              </p>
             </div>
 
             <div>
-              <label htmlFor="payment" className="block mb-1 font-medium">Payment Method</label>
+              <label htmlFor="payment" className="block mb-1 font-medium">
+                Payment Method
+              </label>
               <input
                 type="text"
                 id="payment"
@@ -282,11 +272,11 @@ const EditProfile = ({ setPage }) => {
       {/* Summary Section */}
       <section className="summary grid grid-cols-2 md:grid-cols-5 gap-4 text-center max-w-4xl w-full">
         <div className="card bg-white p-4 rounded-lg shadow">
-          <h3 className="text-xl font-bold">{ticketsThisMonth}</h3>
-          <p>Tickets this month</p>
+          <h3 className="text-xl font-bold">{last30DaysCount}</h3>
+          <p>Tickets (last 30 days)</p>
         </div>
         <div className="card bg-white p-4 rounded-lg shadow">
-          <h3 className="text-xl font-bold">{points}</h3>
+          <h3 className="text-xl font-bold">{totalPoints}</h3>
           <p>Points accumulated</p>
         </div>
         <div className="card bg-white p-4 rounded-lg shadow">
@@ -295,12 +285,14 @@ const EditProfile = ({ setPage }) => {
         </div>
         <div className="card bg-white p-4 rounded-lg shadow">
           <h3 className="text-xl font-bold">
-            {reservations[0] ? new Date(reservations[0].date).toLocaleDateString("en-US") : "Aug 18"}
+            {reservations[0]
+              ? new Date(reservations[0].date).toLocaleDateString("en-US")
+              : "—"}
           </h3>
           <p>Next Reservation</p>
         </div>
         <div className="card bg-white p-4 rounded-lg shadow">
-          <h3 className="text-xl font-bold">{totalReservations}</h3>
+          <h3 className="text-xl font-bold">{totalCount}</h3>
           <p>Total Reservations</p>
         </div>
       </section>
@@ -319,7 +311,8 @@ const EditProfile = ({ setPage }) => {
                 <strong>{res.movieTitle}</strong>
                 <br />
                 <span className="status text-gray-500 text-sm">
-                  {new Date(res.date).toLocaleDateString("en-US")} • {res.room} • {res.status}
+                  {new Date(res.date).toLocaleDateString("en-US")} •{" "}
+                  {res.room} • {res.status}
                 </span>
               </div>
             </div>

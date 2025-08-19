@@ -16,17 +16,21 @@ const Navbar = ({ onLoginClick }) => {
       setUser(currentUser);
 
       if (currentUser) {
+        setUserName(currentUser.displayName || "User");
+
         try {
-          const userDoc = await firebase.firestore().collection("users").doc(currentUser.uid).get();
+          const userDoc = await firebase
+            .firestore()
+            .collection("users")
+            .doc(currentUser.uid)
+            .get();
+
           if (userDoc.exists) {
             const data = userDoc.data();
-            setUserName(data.name || "User");
-          } else {
-            setUserName("User");
+            setUserName(data.name || currentUser.displayName || "User");
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
-          setUserName("User");
         }
       } else {
         setUserName("User");
@@ -105,10 +109,11 @@ const Navbar = ({ onLoginClick }) => {
             )}
           </ul>
 
+          {/* Desktop User Info */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
-                <span className="text-sm font-medium">{userName}</span>
+                <span className="text-sm font-medium">Hi, {userName}!</span>
                 <button
                   onClick={handleLogout}
                   className="text-sm hover:text-gray-300 transition-colors"
@@ -177,11 +182,6 @@ const Navbar = ({ onLoginClick }) => {
                 >
                   Fidelity
                 </Link>
-              </li>
-            )}
-            {user && (
-              <li className="px-6 py-4 w-full text-center">
-                <span className="font-medium">{userName}</span>
               </li>
             )}
             {user && (

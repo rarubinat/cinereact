@@ -1,19 +1,39 @@
 import React, { useContext } from "react";
-import MovieContext from "../../contexts/MovieContext"; // Import MovieContext
+import MovieContext from "../../contexts/MovieContext";
 
-const PriceCalculator = ({ selectedTime, selectedSeats }) => {
-  const { movies } = useContext(MovieContext); // Get the state from MovieContext
+const PriceCalculator = ({ selectedSeats = [], selectedFood = [], freeSnacks = [] }) => {
+  const { movies } = useContext(MovieContext);
+
+  // Precio base por asientos
+  const seatPrice = movies.moviePrice * selectedSeats.length;
+
+  // Precio de snacks seleccionados
+  const foodPrice = selectedFood.reduce(
+    (total, item) => total + (item.price || 0) * (item.quantity || 1),
+    0
+  );
+
+  const totalPrice = seatPrice + foodPrice;
 
   return (
     <div>
       <p>
-        Selected {movies.totalSeats} seats and the total price is{" "}
-        {movies.totalSeats * movies.moviePrice} €
+        Selected {selectedSeats.length} seats. Total price: {totalPrice.toFixed(2)} €
       </p>
-      {/* Calculates and displays the total price based on the number of selected seats
-          and the movie price obtained from MovieContext */}
+
+      {selectedFood.length > 0 && (
+        <p>
+          Selected snacks: {selectedFood.map(f => `${f.name} x${f.quantity}`).join(", ")}
+        </p>
+      )}
+
+      {freeSnacks.length > 0 && (
+        <p>
+          Free snacks included: {freeSnacks.map(f => f.name).join(", ")}
+        </p>
+      )}
     </div>
   );
 };
 
-export default PriceCalculator; // Export PriceCalculator component
+export default PriceCalculator;
