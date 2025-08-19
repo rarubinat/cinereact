@@ -76,5 +76,4 @@ firebase deploy --only hosting
 **2025-06-24**: Real-time validation of reserved seats now based on selected movie and time. Occupied seats shown in red and are unselectable.
 
 ## 📄 License
-This project is licensed under the MIT License.
-© 2025 [rarubinat](https://github.com/rarubinat)
+This project is © 2025 [rarubinat](https://github.com/rarubinat)
