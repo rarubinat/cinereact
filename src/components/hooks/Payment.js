@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import db, { auth } from "../../utils/firebase";
 
 // Generar ID único de ticket
@@ -23,7 +23,7 @@ const Payment = () => {
     foodPrice,
   } = location.state || {};
 
-  // Estados del formulario
+  // ----------------- Estados -----------------
   const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
   const [expiry, setExpiry] = useState("12/34");
   const [cvv, setCvv] = useState("123");
@@ -36,21 +36,48 @@ const Payment = () => {
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [reservationData, setReservationData] = useState(null);
 
-  // Descuentos
-  const availableDiscounts = [
-    { id: 1, name: "10% Off", value: 0.1 },
-    { id: 2, name: "20% Off", value: 0.2 },
-    { id: 3, name: "Student 15% Off", value: 0.15 },
+  // ----------------- Descuentos -----------------
+  const fixedDiscounts = [
+    { id: "d1", name: "10% Off", value: 0.1 },
+    { id: "d2", name: "20% Off", value: 0.2 },
+    { id: "d3", name: "Student 15% Off", value: 0.15 },
   ];
+
+  const [availableDiscounts, setAvailableDiscounts] = useState(fixedDiscounts);
   const [selectedDiscount, setSelectedDiscount] = useState(null);
 
-  // Mostrar alerta temporal
+  // Simulación fecha de nacimiento del usuario (lo ideal es sacarlo de Firestore/Perfil)
+  const userBirthday = "1995-08-20";
+
+  useEffect(() => {
+    const today = new Date();
+    const movieDay = new Date(selectedDate);
+
+    let extraDiscounts = [];
+
+    // 🎂 Cumpleaños → Entrada gratis (1 ticket)
+    if (
+      today.getDate() === new Date(userBirthday).getDate() &&
+      today.getMonth() === new Date(userBirthday).getMonth()
+    ) {
+      extraDiscounts.push({ id: "bday", name: "Birthday Free Ticket", value: 1 });
+    }
+
+    // 🎟️ 2x1 Martes
+    if (movieDay.getDay() === 2) {
+      extraDiscounts.push({ id: "tue", name: "2x1 Tuesday", value: 0.5 });
+    }
+
+    setAvailableDiscounts([...fixedDiscounts, ...extraDiscounts]);
+  }, [selectedDate]);
+
+  // ----------------- Alertas -----------------
   const showAlert = (message) => {
     setAlert({ message, visible: true });
     setTimeout(() => setAlert({ message: "", visible: false }), 3000);
   };
 
-  // Formateos
+  // ----------------- Formateo -----------------
   const formatCardNumber = (value) =>
     value.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim();
 
@@ -59,14 +86,29 @@ const Payment = () => {
       m2 ? `${m1}/${m2}` : m1
     );
 
-  // Precios con descuento
+  // ----------------- Cálculo de precios -----------------
   const seatPrice = totalPrice - (foodPrice || 0);
-  const discountedSeatPrice = selectedDiscount
-    ? seatPrice * (1 - selectedDiscount.value)
-    : seatPrice;
+
+  let discountedSeatPrice = seatPrice;
+  if (selectedDiscount) {
+    if (selectedDiscount.id === "bday") {
+      // 🎂 Solo 1 entrada gratis
+      const seatUnitPrice = seatPrice / selectedSeats.length;
+      discountedSeatPrice = seatPrice - seatUnitPrice;
+    } else if (selectedDiscount.id === "tue") {
+      // 🎟️ Martes 2x1 → solo pagas los impares
+      const seatUnitPrice = seatPrice / selectedSeats.length;
+      const pairs = Math.floor(selectedSeats.length / 2);
+      const rest = selectedSeats.length % 2;
+      discountedSeatPrice = (pairs + rest) * seatUnitPrice;
+    } else {
+      discountedSeatPrice = seatPrice * (1 - selectedDiscount.value);
+    }
+  }
+
   const discountedTotalPrice = discountedSeatPrice + (foodPrice || 0);
 
-  // Manejo del pago
+  // ----------------- Pago -----------------
   const handlePayment = async () => {
     if (!name || !cardNumber || !expiry || !cvv || !billingEmail)
       return showAlert("Please fill in all payment details.");
@@ -116,6 +158,7 @@ const Payment = () => {
     }
   };
 
+  // ----------------- Sin datos -----------------
   if (!selectedMovie) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-800 p-6">
@@ -124,7 +167,7 @@ const Payment = () => {
     );
   }
 
-  // ------------------------- Confirmación -------------------------
+  // ----------------- Confirmación -----------------
   if (paymentCompleted && reservationData) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-900 p-8">
@@ -206,7 +249,7 @@ const Payment = () => {
     );
   }
 
-  // ------------------------- Formulario de pago -------------------------
+  // ----------------- Formulario de pago -----------------
   return (
     <div className="min-h-screen text-gray-900 p-8 max-w-3xl mx-auto relative">
       {alert.visible && (
@@ -232,54 +275,46 @@ const Payment = () => {
 
       <h3 className="text-3xl font-bold text-black mb-6">Payment</h3>
 
-      {/* Resumen de reserva */}
+      {/* Resumen */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-8">
         <h2 className="text-2xl font-semibold mb-4">Reservation Summary</h2>
-        <p>
-          <strong>Movie:</strong> {selectedMovie}
-        </p>
-        <p>
-          <strong>Date:</strong> {selectedDate}
-        </p>
-        <p>
-          <strong>Time:</strong> {selectedTime}
-        </p>
-        <p>
-          <strong>Room:</strong> {room}
-        </p>
-        <p>
-          <strong>Seats:</strong> {selectedSeats.join(", ")}
-        </p>
+        <p><strong>Movie:</strong> {selectedMovie}</p>
+        <p><strong>Date:</strong> {selectedDate}</p>
+        <p><strong>Time:</strong> {selectedTime}</p>
+        <p><strong>Room:</strong> {room}</p>
+        <p><strong>Seats:</strong> {selectedSeats.join(", ")}</p>
 
-        <p>
-          <strong>Seat Price:</strong> {discountedSeatPrice.toFixed(2)} €
-        </p>
-        {foodPrice > 0 && (
-          <p>
-            <strong>Food Price:</strong> {foodPrice.toFixed(2)} €
-          </p>
-        )}
+        <p><strong>Seat Price:</strong> {discountedSeatPrice.toFixed(2)} €</p>
+        {foodPrice > 0 && <p><strong>Food Price:</strong> {foodPrice.toFixed(2)} €</p>}
 
-        {/* Selector de descuentos */}
+        {/* Descuentos */}
         <div className="mt-4">
-          <label className="block text-sm font-semibold mb-1">Discount</label>
-          <select
-            value={selectedDiscount?.id || ""}
-            onChange={(e) =>
-              setSelectedDiscount(
-                availableDiscounts.find((d) => d.id === parseInt(e.target.value)) ||
-                  null
-              )
-            }
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-black mb-4"
-          >
-            <option value="">No discount</option>
+          <h3 className="text-lg font-semibold mb-3">Available Discounts</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {availableDiscounts.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
+              <div
+                key={d.id}
+                onClick={() => setSelectedDiscount(d)}
+                className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center transition shadow-sm 
+                  ${selectedDiscount?.id === d.id
+                    ? "border-black ring-2 ring-black"
+                    : "border-gray-300 hover:border-black"
+                  }`}
+              >
+                <p className="text-xl font-bold">{d.name}</p>
+                <p className="text-gray-500">
+                  {d.id === "bday"
+                    ? "1 Free Ticket"
+                    : d.id === "tue"
+                    ? "2x1 Tuesday"
+                    : `${d.value * 100}% off`}
+                </p>
+                {selectedDiscount?.id === d.id && (
+                  <span className="mt-2 text-green-600 font-semibold">✔ Selected</span>
+                )}
+              </div>
             ))}
-          </select>
+          </div>
         </div>
 
         <p className="mt-2 text-xl font-bold">
@@ -287,7 +322,7 @@ const Payment = () => {
         </p>
       </div>
 
-      {/* Formulario de pago */}
+      {/* Formulario */}
       <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
         <input
           type="text"
