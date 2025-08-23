@@ -67,7 +67,7 @@ const SnacksPage = () => {
               }
             : s
         )
-        .filter((s) => s.quantity >= 0) // permitimos 0
+        .filter((s) => s.quantity > 0)
     );
   };
 
@@ -94,9 +94,6 @@ const SnacksPage = () => {
   return (
     <div className="min-h-screen bg-white text-gray-900 p-8 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Snacks & Drinks</h1>
-      <p className="mb-8 text-gray-600">
-        Add some popcorn and Coca-Cola to make your movie even better 🎉
-      </p>
 
       {/* Snacks grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -109,16 +106,35 @@ const SnacksPage = () => {
             >
               <h3 className="text-lg font-bold mb-2">{item.name}</h3>
               <p className="text-gray-600 text-sm">{item.description}</p>
-              <p className="text-black font-semibold mt-2">{item.price.toFixed(2)} €</p>
-              <button
-                onClick={() => handleAddSnack(item)}
-                disabled={!!snackItem}
-                className={`mt-4 w-full py-2 rounded-full text-white transition ${
-                  snackItem ? "bg-green-600" : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                {snackItem ? `Added ✅ (${snackItem.QuantitySnack})` : "Add"}
-              </button>
+              <p className="text-black font-semibold mt-2">
+                {item.price.toFixed(2)} €
+              </p>
+
+              {/* Controles de cantidad */}
+              {!snackItem ? (
+                <button
+                  onClick={() => handleAddSnack(item)}
+                  className="mt-4 w-full py-2 rounded-full text-white bg-black hover:bg-gray-800 transition"
+                >
+                  Add
+                </button>
+              ) : (
+                <div className="mt-4 flex items-center justify-center space-x-4">
+                  <button
+                    onClick={() => handleDecrease(item.id)}
+                    className="bg-gray-300 px-3 py-1 rounded-full hover:bg-gray-400"
+                  >
+                    -
+                  </button>
+                  <span className="font-semibold">{snackItem.QuantitySnack}</span>
+                  <button
+                    onClick={() => handleIncrease(item.id)}
+                    className="bg-gray-300 px-3 py-1 rounded-full hover:bg-gray-400"
+                  >
+                    +
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}

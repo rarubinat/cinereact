@@ -14,7 +14,11 @@ import Films from "./components/cinema/Films";
 import MovieDetails from "./components/cinema/MovieDetails";
 import ReserveMovie from "./components/layout/ReserveMovie";
 import SnacksPage from "./components/hooks/SnacksPage";
-import Payment from "./components/hooks/Payment";
+
+
+import Payment from "./components/payment/Payment";
+
+
 
 import Promotions from "./components/layout/Promotions";
 import Fidelity from "./components/layout/Fidelity";

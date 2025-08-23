@@ -5,8 +5,8 @@ import { auth } from "../../utils/firebase";
 import db from "../../utils/firebase";
 
 const Login = ({ embedded = false, onSuccess, setPage }) => {
-  const [email, setEmail] = useState("alrubinat@gmail.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("test@gmail.com");
+  const [password, setPassword] = useState("test1234");
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
