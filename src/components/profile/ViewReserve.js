@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import db, { auth } from "../../utils/firebase";
-import moviesData from "../../data/moviesData";
+import { QRCodeCanvas } from "qrcode.react";
 
 const ViewReserve = ({ setPage }) => {
   const [reservations, setReservations] = useState([]);
-  const [alert, setAlert] = useState({ message: "", visible: false });
+  const [setAlert] = useState({ message: "", visible: false });
   const [confirmModal, setConfirmModal] = useState({
     visible: false,
     reservationId: null,
@@ -30,10 +30,14 @@ const ViewReserve = ({ setPage }) => {
         .where("userId", "==", currentUser.uid)
         .get();
 
-      const data = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const data = querySnapshot.docs.map((doc) => {
+        const docData = doc.data();
+        return {
+          id: doc.id,
+          ticketId: docData.ticketId, // <-- traemos ticketId
+          ...docData,
+        };
+      });
 
       data.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
       setReservations(data);
@@ -67,35 +71,60 @@ const ViewReserve = ({ setPage }) => {
     const [d, m, y] = ddmmyyyy.split("/");
     return new Date(`${y}-${m}-${d}`);
   };
-  const upcomingReservations = reservations.filter((r) => toDate(r.selectedDate) >= today);
-  const pastReservations = reservations.filter((r) => toDate(r.selectedDate) < today);
+  const upcomingReservations = reservations.filter(
+    (r) => toDate(r.selectedDate) >= today
+  );
+  const pastReservations = reservations.filter(
+    (r) => toDate(r.selectedDate) < today
+  );
 
   const renderReservationCard = (reservation) => {
-    const movie = moviesData[reservation.selectedMovie] || {};
-    const img = movie.image;
+    // 🔹 Datos que van dentro del QR
+    const qrData = JSON.stringify({
+      movie: reservation.selectedMovie,
+      date: reservation.selectedDate,
+      time: reservation.selectedTime,
+      room: reservation.room,
+      seats: reservation.selectedSeats,
+      total: reservation.totalPrice,
+      ticketId: reservation.ticketId, // <-- incluimos ticketId en el QR
+    });
 
     return (
       <div
         key={reservation.id}
         className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col h-full"
       >
-        {img && (
-          <img
-            src={img}
-            alt={reservation.selectedMovie}
-            className="w-full h-56 md:h-64 object-cover"
+        {/* Código QR */}
+        <div className="flex items-center justify-center p-4 bg-gray-100">
+          <QRCodeCanvas
+            value={qrData}
+            size={180}
+            level="H"
+            includeMargin={true}
           />
-        )}
+        </div>
+
         <div className="p-4 space-y-1 flex-grow">
-          <h3 className="text-lg font-semibold text-black">{reservation.selectedMovie}</h3>
+          <h3 className="text-lg font-semibold text-black">
+            {reservation.selectedMovie}
+          </h3>
           <p className="text-sm text-gray-600">
             {reservation.selectedDate} • {reservation.selectedTime}
           </p>
           <p className="text-sm text-gray-600">Room: {reservation.room}</p>
           <p className="text-sm text-gray-600">
-            Seats: {Array.isArray(reservation.selectedSeats) ? reservation.selectedSeats.join(", ") : "-"}
+            Seats:{" "}
+            {Array.isArray(reservation.selectedSeats)
+              ? reservation.selectedSeats.join(", ")
+              : "-"}
           </p>
-          <p className="text-sm font-medium text-gray-900">Total: {reservation.totalPrice} €</p>
+          <p className="text-sm font-medium text-gray-900">
+            Total: {reservation.totalPrice} €
+          </p>
+          <p className="text-sm text-gray-600">
+            Ticket ID: {reservation.ticketId} {/* <-- mostramos ticketId */}
+          </p>
 
           {activeTab === "upcoming" && (
             <button
@@ -144,27 +173,36 @@ const ViewReserve = ({ setPage }) => {
             {upcomingReservations.map(renderReservationCard)}
           </div>
         ) : (
-          <p className="text-center text-gray-500 mt-10">You have no upcoming reservations.</p>
+          <p className="text-center text-gray-500 mt-10">
+            You have no upcoming reservations.
+          </p>
         )
       ) : pastReservations.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
           {pastReservations.map(renderReservationCard)}
         </div>
       ) : (
-        <p className="text-center text-gray-500 mt-10">There are no past reservations.</p>
+        <p className="text-center text-gray-500 mt-10">
+          There are no past reservations.
+        </p>
       )}
 
-      {/* Modal de confirmación (claro) */}
+      {/* Modal de confirmación */}
       {confirmModal.visible && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full">
-            <h2 className="text-lg font-semibold text-black mb-2">Cancel reservation</h2>
+            <h2 className="text-lg font-semibold text-black mb-2">
+              Cancel reservation
+            </h2>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to cancel this reservation? This action cannot be undone.
+              Are you sure you want to cancel this reservation? This action
+              cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setConfirmModal({ visible: false, reservationId: null })}
+                onClick={() =>
+                  setConfirmModal({ visible: false, reservationId: null })
+                }
                 className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-800"
               >
                 Keep

@@ -157,7 +157,7 @@ const MovieDetails = () => {
             className="w-full mt-4 bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-full font-semibold transition"
             onClick={handleReserve}
           >
-            Continue
+            Confirm
           </button>
         </div>
       </div>

@@ -13,30 +13,24 @@ const generateTicketId = () => {
 const parseBirthdateToDayMonth = (raw) => {
   if (!raw) return null;
 
-  // Firestore Timestamp
   if (typeof raw?.toDate === "function") {
     const d = raw.toDate();
     return { day: d.getDate(), month: d.getMonth() + 1 };
   }
 
-  // Date object
   if (raw instanceof Date && !isNaN(raw)) {
     return { day: raw.getDate(), month: raw.getMonth() + 1 };
   }
 
-  // String formats
   if (typeof raw === "string") {
-    // YYYY-MM-DD (seguro y sin timezone si partimos manualmente)
     if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
       const [y, m, d] = raw.split("-").map(Number);
       return { day: d, month: m };
     }
-    // DD/MM/YYYY
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
       const [d, m] = raw.split("/").map(Number);
       return { day: d, month: m };
     }
-    // Fallback: intentar Date()
     const t = new Date(raw);
     if (!isNaN(t)) {
       return { day: t.getDate(), month: t.getMonth() + 1 };
@@ -60,7 +54,6 @@ const Payment = () => {
     foodPrice,
   } = location.state || {};
 
-  // ----------------- Estados -----------------
   const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
   const [expiry, setExpiry] = useState("12/34");
   const [cvv, setCvv] = useState("123");
@@ -73,12 +66,10 @@ const Payment = () => {
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [reservationData, setReservationData] = useState(null);
 
-  // Cumpleaños (de Firestore)
-  const [bday, setBday] = useState(null); // { day, month } o null
+  const [bday, setBday] = useState(null);
   const [bdayLoaded, setBdayLoaded] = useState(false);
   const [bdayHasValue, setBdayHasValue] = useState(false);
 
-  // Cargar cumpleaños desde Firestore (acepta birthdate o birthday)
   useEffect(() => {
     const fetchUserBirthday = async () => {
       try {
@@ -104,47 +95,66 @@ const Payment = () => {
 
   // ----------------- Descuentos -----------------
   const fixedDiscounts = [
-    { id: "d1", name: "10% Off", value: 0.1, available: true },
-    { id: "d2", name: "20% Off", value: 0.2, available: true },
-    { id: "d3", name: "Student 15% Off", value: 0.15, available: true },
+    { id: "none", name: "No discount", value: 0, available: true },
+    { id: "d3", name: "Student Discount", value: 0.15, available: true },
   ];
 
   const [availableDiscounts, setAvailableDiscounts] = useState(fixedDiscounts);
-  const [selectedDiscount, setSelectedDiscount] = useState(null);
+  // Seleccionado por defecto: "No discount"
+  const [selectedDiscount, setSelectedDiscount] = useState(fixedDiscounts[0]);
 
   useEffect(() => {
     if (!selectedDate) return;
 
-    const today = new Date();
     const movieDay = new Date(selectedDate);
-
-    const todayDay = today.getDate();
-    const todayMonth = today.getMonth() + 1;
-
-    const isBirthdayToday = !!(bday && bday.day === todayDay && bday.month === todayMonth);
+    const dayOfWeek = movieDay.getDay(); // 0 = Sunday, 6 = Saturday
 
     const extraDiscounts = [];
 
-    // 🎂 Cumpleaños: siempre mostrar
+    // 🎉 Weekend Deal
+    const isWeekend = dayOfWeek === 6 || dayOfWeek === 0;
+    extraDiscounts.push({
+      id: "weekend",
+      name: "Weekend Deal",
+      value: 0.2,
+      available: isWeekend && (foodPrice && foodPrice > 0),
+      reason: !isWeekend
+        ? "Only available on Saturdays and Sundays"
+        : !foodPrice
+        ? "No food items selected"
+        : "",
+    });
+
+    // 🎂 Birthday
+    const today = new Date();
+    const isBirthdayToday =
+      !!(bday && bday.day === today.getDate() && bday.month === today.getMonth() + 1);
     extraDiscounts.push({
       id: "bday",
-      name: "Birthday Free Ticket",
+      name: "Birthday Special",
       value: 1,
       available: isBirthdayToday,
       reason: !bdayLoaded
         ? "Checking birthday…"
         : bdayHasValue
-          ? (isBirthdayToday ? "" : "Only available on your birthday")
-          : "Birthdate not set in profile",
+        ? isBirthdayToday
+          ? ""
+          : "Only available on your birthday"
+        : "Birthdate not set in profile",
     });
 
-    // 🎟️ 2x1 Martes
+    // 🎟️ 2x1 Tuesday
     if (movieDay.getDay() === 2) {
-      extraDiscounts.push({ id: "tue", name: "2x1 Tuesday", value: 0.5, available: true });
+      extraDiscounts.push({
+        id: "tue",
+        name: "2x1 Tuesday",
+        value: 0.5,
+        available: true,
+      });
     }
 
     setAvailableDiscounts([...fixedDiscounts, ...extraDiscounts]);
-  }, [selectedDate, bday, bdayLoaded, bdayHasValue]);
+  }, [selectedDate, bday, bdayLoaded, bdayHasValue, foodPrice]);
 
   // ----------------- Alertas -----------------
   const showAlert = (message) => {
@@ -164,22 +174,31 @@ const Payment = () => {
   // ----------------- Cálculo de precios -----------------
   const seatPrice = totalPrice - (foodPrice || 0);
 
+  let discountedFoodPrice = foodPrice || 0;
   let discountedSeatPrice = seatPrice;
-  if (selectedDiscount) {
-    if (selectedDiscount.id === "bday") {
-      const seatUnitPrice = seatPrice / selectedSeats.length;
-      discountedSeatPrice = seatPrice - seatUnitPrice; // 1 entrada gratis
-    } else if (selectedDiscount.id === "tue") {
-      const seatUnitPrice = seatPrice / selectedSeats.length;
-      const pairs = Math.floor(selectedSeats.length / 2);
-      const rest = selectedSeats.length % 2;
-      discountedSeatPrice = (pairs + rest) * seatUnitPrice; // 2x1
-    } else {
-      discountedSeatPrice = seatPrice * (1 - selectedDiscount.value);
+
+  if (selectedDiscount && selectedDiscount.id !== "none") {
+    switch (selectedDiscount.id) {
+      case "bday":
+        const seatUnitPrice = seatPrice / selectedSeats.length;
+        discountedSeatPrice = seatPrice - seatUnitPrice;
+        break;
+      case "tue":
+        const pairs = Math.floor(selectedSeats.length / 2);
+        const rest = selectedSeats.length % 2;
+        const seatUnit = seatPrice / selectedSeats.length;
+        discountedSeatPrice = (pairs + rest) * seatUnit;
+        break;
+      case "weekend":
+        discountedFoodPrice = foodPrice * (1 - selectedDiscount.value);
+        break;
+      default:
+        discountedSeatPrice = seatPrice * (1 - selectedDiscount.value);
+        break;
     }
   }
 
-  const discountedTotalPrice = discountedSeatPrice + (foodPrice || 0);
+  const discountedTotalPrice = discountedSeatPrice + discountedFoodPrice;
 
   // ----------------- Pago -----------------
   const handlePayment = async () => {
@@ -211,7 +230,7 @@ const Payment = () => {
       timestamp: new Date(),
       totalPrice: discountedTotalPrice,
       seatPrice: discountedSeatPrice,
-      foodPrice: foodPrice || 0,
+      foodPrice: discountedFoodPrice,
       ticketId: generateTicketId(),
       billingEmail,
       billingCountry,
@@ -231,7 +250,6 @@ const Payment = () => {
     }
   };
 
-  // ----------------- Sin datos -----------------
   if (!selectedMovie) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 text-gray-800 p-6">
@@ -240,7 +258,6 @@ const Payment = () => {
     );
   }
 
-  // ----------------- Confirmación -----------------
   if (paymentCompleted && reservationData) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-900 p-8">
@@ -300,7 +317,6 @@ const Payment = () => {
     );
   }
 
-  // ----------------- Formulario de pago -----------------
   return (
     <div className="min-h-screen p-8 max-w-3xl mx-auto relative">
       {alert.visible && (
@@ -325,10 +341,8 @@ const Payment = () => {
       )}
 
       <h3 className="text-3xl font-bold text-black mb-6">Payment</h3>
-
-      {/* Resumen */}
       <div className="bg-white p-6 rounded-2xl shadow-lg mb-8 border border-gray-200">
-        <h2 className="text-2xl font-semibold mb-4">🎟️ Reservation Summary</h2>
+        <h2 className="text-2xl font-semibold mb-4">Reservation Summary</h2>
         <div className="space-y-1 text-gray-700">
           <p><strong>Movie:</strong> {selectedMovie}</p>
           <p><strong>Date:</strong> {selectedDate}</p>
@@ -341,12 +355,11 @@ const Payment = () => {
         </div>
       </div>
 
-      {/* Descuentos */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-3">Available Discounts</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {availableDiscounts.map((d) => {
-            const disabled = d.available === false;
+            const disabled = !d.available;
 
             return (
               <div
@@ -354,17 +367,20 @@ const Payment = () => {
                 onClick={() => !disabled && setSelectedDiscount(d)}
                 className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center transition shadow-sm
                   ${selectedDiscount?.id === d.id ? "border-black ring-2 ring-black" : "border-gray-300 hover:border-black"}
-                  ${disabled ? "opacity-40 cursor-not-allowed" : ""}
-                `}
+                  ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
               >
                 <p className="text-lg font-bold">{d.name}</p>
                 <p className="text-sm text-gray-500">
                   {d.id === "bday"
                     ? d.available
-                      ? "🎂 1 Free Ticket"
+                      ? "1 Free ticket"
                       : `Unavailable${d.reason ? ` — ${d.reason}` : ""}`
                     : d.id === "tue"
-                    ? "2x1 Tuesday"
+                    ? "2x1 ticket"
+                    : d.id === "weekend"
+                    ? "20% off on snacks"
+                    : d.id === "none"
+                    ? "No discount applied"
                     : `${d.value * 100}% off`}
                 </p>
                 {selectedDiscount?.id === d.id && !disabled && (
@@ -376,7 +392,6 @@ const Payment = () => {
         </div>
       </div>
 
-      {/* Formulario */}
       <div className="mt-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-200 space-y-4">
         <h3 className="text-xl font-semibold mb-4">Card Details</h3>
 

@@ -23,23 +23,30 @@ const useReservationCount = () => {
         return;
       }
 
-      // 🔹 Consultar todas las reservas del usuario (SDK vieja)
+      // 🔹 Traer reservas del usuario
       const querySnapshot = await db
         .collection("reservas")
         .where("userId", "==", currentUser.uid)
         .get();
 
-      const reservations = querySnapshot.docs.map((doc) => doc.data());
+      const reservations = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-      // Total de reservas
+      // Total de reservas (incluye canceladas)
       setTotalCount(reservations.length);
+
+      // 🔹 Calcular reservas activas
+      const activeReservations = reservations.filter(
+        (r) => r.status !== "cancelled"
+      );
 
       // 🔹 Calcular fecha de corte (últimos 30 días)
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - 30);
 
-      // 🔹 Contar reservas en últimos 30 días
-      const last30 = reservations.filter((r) => {
+      const last30 = activeReservations.filter((r) => {
         if (!r.date) return false;
         const reservationDate = r.date.toDate ? r.date.toDate() : new Date(r.date);
         return reservationDate >= cutoffDate;
@@ -47,11 +54,11 @@ const useReservationCount = () => {
 
       setLast30DaysCount(last30);
 
-      // Calcular puntos totales
-      const points = reservations.length * POINTS_PER_RESERVATION;
+      // 🔹 Puntos solo por reservas activas
+      const points = activeReservations.length * POINTS_PER_RESERVATION;
       setTotalPoints(points);
 
-      // 🔹 Actualizar puntos en Firestore
+      // 🔹 Guardar puntos actualizados en Firestore
       await db.collection("users").doc(currentUser.uid).update({ points });
 
     } catch (error) {

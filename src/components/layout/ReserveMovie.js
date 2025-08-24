@@ -60,7 +60,7 @@ const ReserveMovie = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 p-8 max-w-5xl mx-auto relative">
+    <div className="min-h-screen text-gray-900 p-8 max-w-5xl mx-auto relative">
       {/* Alert */}
       {alert.visible && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-50">
@@ -83,7 +83,7 @@ const ReserveMovie = () => {
         </div>
       )}
 
-      <h1 className="text-4xl font-bold mb-8">{selectedMovie}</h1>
+      <h3 className="text-3xl font-bold text-black mb-6">{selectedMovie}</h3>
 
       <div className="space-y-8">
         {/* Datos + Poster */}
@@ -116,7 +116,7 @@ const ReserveMovie = () => {
 
         {/* Seat selector */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Select your seats</h2>
+          <h3 className="text-3xl font-bold text-black mb-6">Select your seats</h3>
           <SeatMatrix
             onSeatSelection={handleSeatSelection}
             selectedMovie={selectedMovie}
@@ -140,7 +140,7 @@ const ReserveMovie = () => {
               onClick={handleGoToSnacks}
               className="w-full py-3 px-6 rounded-full font-semibold text-white bg-black hover:bg-gray-800 transition"
             >
-              Continue to Snacks
+              Confirm
             </button>
           </div>
         )}

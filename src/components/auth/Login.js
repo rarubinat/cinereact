@@ -45,6 +45,24 @@ const Login = ({ embedded = false, onSuccess, setPage }) => {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError("Por favor, introduce tu correo para recuperar la contraseña.");
+      return;
+    }
+
+    try {
+      await auth.sendPasswordResetEmail(email);
+      setSuccessMsg("Te hemos enviado un correo para restablecer tu contraseña.");
+      setError("");
+    } catch (err) {
+      let message = "Error al intentar recuperar la contraseña.";
+      if (err.code === "auth/user-not-found") message = "El usuario no existe.";
+      else if (err.code === "auth/invalid-email") message = "Correo inválido.";
+      setError(message);
+    }
+  };
+
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm fixed inset-0 z-50">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-2xl relative">
@@ -89,6 +107,14 @@ const Login = ({ embedded = false, onSuccess, setPage }) => {
         >
           Log In
         </button>
+
+        {/* Recuperar contraseña */}
+        <p
+          onClick={handleResetPassword}
+          className="mt-3 text-center text-blue-600 cursor-pointer underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </p>
 
         {error && <p className="text-red-600 mt-3 text-center">{error}</p>}
 

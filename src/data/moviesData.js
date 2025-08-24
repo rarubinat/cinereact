@@ -144,14 +144,13 @@ const moviesData = {
     directors: ["Joseph Kosinski"],
     writers: ["Ehren Kruger"],
     rating: "Unrated",
-    showtimes: [] // Coming soon → no showtimes yet
+    showtimes: []
   },
-
-  "Sé lo que hicistéis el último verano (2025)": {
+  "I Know What You Did Last Summer (2025)": {
     category: "COMING_SOON",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/Se_Lo_Que_Hicisteis_El_Ultimo_Verano.avif?alt=media&token=27f63d21-3018-4168-816e-675c91d477d5",
-    synopsis: "Años después de los horribles eventos que traumatizaron a un grupo de amigos, una nueva amenaza emerge con sed de venganza. Esta nueva entrega reinventa el clásico del terror con giros inesperados y una tensión constante.",
+    synopsis: "Years after the horrifying events that traumatized a group of friends, a new threat emerges thirsting for revenge. This new installment reinvents the classic horror tale with unexpected twists and constant tension.",
     duration: 105,
     releaseDate: "2025-08-01",
     genre: "Horror, Mystery, Thriller",
@@ -160,12 +159,11 @@ const moviesData = {
     rating: "Unrated",
     showtimes: []
   },
-
-  "28 Años Después": {
+  "28 Years Later": {
     category: "COMING_SOON",
     price: 7.50,
     image: "https://firebasestorage.googleapis.com/v0/b/cinereact-380f3.appspot.com/o/28_A%C3%B1os_Despues.avif?alt=media&token=46e85d65-a393-4633-a907-ef431222bd72",
-    synopsis: "Secuela directa de '28 Días Después' y '28 Semanas Después'. El virus Rage regresa más letal que nunca, poniendo a prueba la humanidad de los pocos supervivientes que quedan en un mundo devastado y sin esperanza.",
+    synopsis: "Direct sequel to '28 Days Later' and '28 Weeks Later'. The Rage virus returns deadlier than ever, testing the humanity of the few survivors left in a devastated, hopeless world.",
     duration: 115,
     releaseDate: "2025-06-20",
     genre: "Horror, Sci-Fi, Drama",
@@ -174,7 +172,6 @@ const moviesData = {
     rating: "Unrated",
     showtimes: []
   }
-
 };
 
 export default moviesData;

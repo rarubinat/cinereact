@@ -92,8 +92,8 @@ const SnacksPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 p-8 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Snacks & Drinks</h1>
+    <div className="min-h-screen text-gray-900 p-8 max-w-5xl mx-auto">
+      <h3 className="text-3xl font-bold text-black mb-6"> Get your snacks or drinks</h3>
 
       {/* Snacks grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -160,7 +160,7 @@ const SnacksPage = () => {
           }
           className="mt-2 w-full py-3 px-6 rounded-full font-semibold text-white bg-gray-500 hover:bg-gray-600 transition"
         >
-          No quiero snacks, continuar
+          No snacks, continue to payment
         </button>
       </div>
 

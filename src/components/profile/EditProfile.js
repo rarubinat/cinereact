@@ -19,7 +19,7 @@ const EditProfile = ({ setPage }) => {
   const [reservations, setReservations] = useState([]);
   const [currentPlan, setCurrentPlan] = useState("Silver");
 
-  const { totalCount, last30DaysCount, totalPoints, loading } =
+  const { totalCount, last30DaysCount, totalPoints } =
     useReservationCount();
 
   useEffect(() => {
@@ -39,18 +39,30 @@ const EditProfile = ({ setPage }) => {
             setCurrentPlan((data.points || 0) > 250 ? "Gold" : "Silver");
           }
 
+          // Traer TODAS las reservas del usuario
           const resSnapshot = await db
             .collection("reservas")
             .where("userId", "==", user.uid)
-            .orderBy("date", "desc")
-            .limit(30)
             .get();
 
-          const pastReservations = resSnapshot.docs.map((doc) => ({
+          const allReservations = resSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
-          setReservations(pastReservations);
+
+          // Filtrar solo las que son >= hoy
+          const today = new Date();
+          const upcoming = allReservations
+            .filter((r) => {
+              if (!r.selectedDate) return false;
+              const d = new Date(r.selectedDate);
+              return d >= today;
+            })
+            .sort(
+              (a, b) => new Date(a.selectedDate) - new Date(b.selectedDate)
+            );
+
+          setReservations(upcoming);
         } catch (err) {
           console.error("Error fetching user or reservations", err);
         }
@@ -138,7 +150,7 @@ const EditProfile = ({ setPage }) => {
       </section>
 
       {/* Summary Section */}
-      <section className="summary grid grid-cols-2 md:grid-cols-5 gap-4 text-center max-w-4xl w-full mt-8">
+      <section className="summary grid grid-cols-2 md:grid-cols-4 gap-4 text-center max-w-4xl w-full mt-8">
         <div className="card bg-white p-4 rounded-lg shadow">
           <h3 className="text-xl font-bold">{totalPoints}</h3>
           <p>Points accumulated</p>
@@ -151,13 +163,17 @@ const EditProfile = ({ setPage }) => {
           <h3 className="text-xl font-bold">{totalCount}</h3>
           <p>Total Reservations</p>
         </div>
-         <div className="card bg-white p-4 rounded-lg shadow">
-          <h3 className="text-xl font-bold">{totalCount}</h3>
-          <p>Next reserve</p>
+        <div className="card bg-white p-4 rounded-lg shadow">
+          <h3 className="text-xl font-bold">
+            {reservations.length > 0
+              ? new Date(reservations[0].selectedDate).toLocaleDateString(
+                  "es-ES"
+                )
+              : "No upcoming reservations"}
+          </h3>
+          <p>Next Reservation</p>
         </div>
       </section>
-
-     
 
       {/* Modal de Edición sobre el navbar */}
       {editing && (
@@ -232,18 +248,28 @@ const EditProfile = ({ setPage }) => {
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
+                  <option value="Prefer not to say">
+                    Prefer not to say
+                  </option>
                 </select>
               </div>
 
               <div>
-                <label className="block mb-1 font-medium">Preferred Language</label>
-                <p className="p-2 border rounded-lg bg-gray-100">{form.language}</p>
+                <label className="block mb-1 font-medium">
+                  Preferred Language
+                </label>
+                <p className="p-2 border rounded-lg bg-gray-100">
+                  {form.language}
+                </p>
               </div>
 
               <div>
-                <label className="block mb-1 font-medium">Membership Plan</label>
-                <p className="p-2 border rounded-lg bg-gray-100">{currentPlan}</p>
+                <label className="block mb-1 font-medium">
+                  Membership Plan
+                </label>
+                <p className="p-2 border rounded-lg bg-gray-100">
+                  {currentPlan}
+                </p>
               </div>
 
               <div>

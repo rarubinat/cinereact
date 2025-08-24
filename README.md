@@ -58,6 +58,8 @@ firebase deploy --only hosting
 
 ## 📅 Update History
 
+**2025-08-25**: Snacks section.
+
 **2025-08-15**: Payment method.
 
 **2025-08-14**: New layout!
