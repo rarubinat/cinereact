@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import moviesData from "../../data/moviesData";
 import SeatMatrix from "../../components/cinema/seats/SeatMatrix";
 import ProgressBar from "./../../context/ProgressBar"; // Component to show multi-step progress
-import { useNotification } from "../../context/NotificationContext";
 
 /**
  * ReserveMovie Component
@@ -15,7 +14,6 @@ import { useNotification } from "../../context/NotificationContext";
 const ReserveMovie = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { notify } = useNotification();
 
   // Extract selected movie details from router state
   const { selectedMovie, selectedDate, selectedTime } = location.state || {};

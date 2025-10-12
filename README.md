@@ -11,11 +11,6 @@ A sleek, responsive **React-based cinema booking system** that allows users to s
 - React Icons for UI icons
 - Jest / Vitest + React Testing Library for testing
 
-## 🧪 Testing
-
-- Unit tests for hooks (useReservationCount)
-- Component tests for booking flow (SeatMatrix, ApplyOffers, PriceCalculator)
-- Mocked Firebase integration (no real API calls)
 
 ## 🚀 Features
 
@@ -26,11 +21,21 @@ A sleek, responsive **React-based cinema booking system** that allows users to s
   - ⬜ Available (grey)
 - 🎥 Multiple movies & schedules support
 - 📱 Fully responsive UI with modern styling (TailwindCSS)
-
-- Roadmap:
 - 🎟 Ticket QR code generation
 - 🍿 Snack/food ordering integration
 - 💳 Secure payments
+
+## 🧩 Core Concept
+
+The app follows a multi-step booking flow managed through a global BookingContext:
+
+- Date/Time selection
+- Seat selection
+- Snacks selection
+- Payment
+- Confirmation
+
+A responsive ProgressBar visually guides users through each step, ensuring clarity and consistency across the booking journey.
 
 - 👤 Profile management:
   - Edit personal info (name, phone, birthdate, gender, payment method)
@@ -40,21 +45,50 @@ A sleek, responsive **React-based cinema booking system** that allows users to s
 - 🏆 Loyalty system:
   - Earn 20 points per active reservation
   - Membership plan: Silver (default) → Gold (>250 points) → Platinium (>1200 points)
-  - 💳 Offers & discounts applied dynamically based on selection
-  - 🔒 Firebase Authentication & Firestore integration
+  - Offers & discounts applied dynamically based on selection
+  - Firebase Authentication & Firestore integration
 
 
 ## 📂 Project Structure
 
+```bash
 src/
- ├─ components/
- │   ├─ cinema/         # SeatMatrix, ApplyOffers, PriceCalculator
- │   ├─ layout/         # Navbar, Footer, Layout wrappers
- │   └─ profile/        # EditProfile, UserSummary
- ├─ hooks/              # Custom hooks (useReservationCount, etc.)
- ├─ utils/              # Firebase config, helpers
- ├─ pages/              # Main pages (Booking, Profile, Home)
- └─ tests/              # Unit & integration tests (Jest/Vitest)
+│
+├── components/
+│   ├── auth/               
+│   ├── cinema/              
+│   ├── hooks/               
+│   ├── payment/             
+│   ├── profile/            
+│   ├── pages/                         
+│   └── styles/      
+│
+├── context/
+│   ├── NotificationContext.js
+│   └── ProgressBar.js
+│
+├── data/
+│   ├── moviesData.js
+│   ├── foodData.js
+│   ├── promotionsData.js
+│   └── fidelityData.js
+│
+├── utils/
+│   ├── firebase.js
+│   └── priceCalculator.js   
+│
+├── tests/                  
+│
+├── App.js
+└── index.js
+```
+
+
+## 🧪 Testing
+
+- ✅ Unit tests for hooks (useBooking, useReservationCount)
+- ✅ Component tests for booking flow (SeatMatrix, ApplyOffers, PriceCalculator)
+- ✅ Mocked Firebase integration (no real API calls)
 
 ---
 
@@ -89,9 +123,12 @@ firebase deploy
 
 # Without/functions deploy
 firebase deploy --only hosting
+
 ```
 
 ## 📅 Update History
+
+**2025-10-07**: Implementation of unit and integration tests with Jest/Vitest. Refactoring of components and hooks to improve maintainability.
 
 **2025-09-23**: Logic notifications in-app.
 

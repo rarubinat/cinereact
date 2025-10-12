@@ -1,21 +1,24 @@
 // __tests__/components/Payment.test.jsx
+// Import tools for testing React components
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Payment from "../../src/components/payment/Payment";
 
 // --- Mock Firebase ---
+// Simulate Firebase functionality so no real database is needed
 jest.mock("../../src/utils/firebase", () => ({
   __esModule: true,
-  default: { collection: jest.fn(() => ({ add: jest.fn() })) },
-  auth: { currentUser: { uid: "user123", email: "test@example.com" } },
+  default: { collection: jest.fn(() => ({ add: jest.fn() })) }, // mock adding to collection
+  auth: { currentUser: { uid: "user123", email: "test@example.com" } }, // simulate logged-in user
 }));
 
 // --- Mock react-router-dom ---
+// Simulate navigation and location state for testing without a real router
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useNavigate: () => mockNavigate,
-  useLocation: () => ({
+  useNavigate: () => mockNavigate, // intercept navigation calls
+  useLocation: () => ({               // provide fake location state
     state: {
       selectedMovie: "Dune 2",
       selectedDate: "2025-10-04",
@@ -30,7 +33,12 @@ jest.mock("react-router-dom", () => ({
   }),
 }));
 
+// ------------------------------
+// Payment Component Tests
+// ------------------------------
 describe("Payment Component", () => {
+
+  // Test that the reservation summary is rendered correctly
   test("renders reservation summary", () => {
     render(
       <MemoryRouter>
@@ -43,6 +51,7 @@ describe("Payment Component", () => {
     expect(screen.getByText(/24.00 €/)).toBeInTheDocument();
   });
 
+  // Test that clicking the Pay button opens the confirmation modal
   test("opens confirmation modal on Pay button click", () => {
     render(
       <MemoryRouter>
@@ -50,10 +59,11 @@ describe("Payment Component", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByText(/Pay 24.00 €/i));
-    expect(screen.getByText("Confirm Payment")).toBeInTheDocument();
+    fireEvent.click(screen.getByText(/Pay 24.00 €/i)); // simulate clicking "Pay" button
+    expect(screen.getByText("Confirm Payment")).toBeInTheDocument(); // modal should appear
   });
 
+  // Test that confirming payment triggers navigation to confirmation page
   test("confirms payment and navigates to confirmation page", async () => {
     render(
       <MemoryRouter>
@@ -61,13 +71,14 @@ describe("Payment Component", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByText(/Pay 24.00 €/i));
-    fireEvent.click(screen.getByText(/Yes, Pay/i));
+    fireEvent.click(screen.getByText(/Pay 24.00 €/i)); // open confirmation modal
+    fireEvent.click(screen.getByText(/Yes, Pay/i));    // confirm payment
 
+    // Wait for navigation function to be called
     await waitFor(() =>
       expect(mockNavigate).toHaveBeenCalledWith(
-        "/confirmation",
-        expect.any(Object)
+        "/confirmation",     // navigation target
+        expect.any(Object)   // with some state object
       )
     );
   });

@@ -2,8 +2,10 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import ViewReserve from "../components/ViewReserve";
 
+// --- Mock Firebase ---
+// Simulate Firebase so no real backend is needed
 jest.mock("../../utils/firebase", () => ({
-  auth: { currentUser: { uid: "testuser" } },
+  auth: { currentUser: { uid: "testuser" } }, // Simulate logged-in user
   default: {
     collection: jest.fn(() => ({
       where: jest.fn(() => ({
@@ -30,22 +32,27 @@ jest.mock("../../utils/firebase", () => ({
   },
 }));
 
+// --- Mock Notification Context ---
+// Prevents real notifications during testing
 jest.mock("../../context/NotificationContext", () => ({
   useNotification: () => ({ notify: jest.fn() }),
 }));
 
-test("renderiza reservas y abre modal QR", async () => {
-  render(<ViewReserve />);
+// ------------------------------
+// Test: Render reservations and open QR modal
+// ------------------------------
+test("renders reservations and opens QR modal", async () => {
+  render(<ViewReserve />); // Render the ViewReserve component
 
-  // Espera que aparezca el título principal
+  // Wait for the main title to appear
   expect(await screen.findByText(/My Bookings/i)).toBeInTheDocument();
 
-  // Película cargada correctamente
+  // Check that the movie "Inception" is displayed
   expect(await screen.findByText(/Inception/i)).toBeInTheDocument();
 
-  // Simula click en cancel
+  // Simulate clicking the "Cancel reservation" button
   fireEvent.click(screen.getByText(/Cancel reservation/i));
 
-  // Aparece el modal
+  // Check that the cancel reservation modal appears
   expect(await screen.findByText(/Cancel reservation/i)).toBeInTheDocument();
 });

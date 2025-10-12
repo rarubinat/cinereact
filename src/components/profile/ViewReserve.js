@@ -68,7 +68,22 @@ const ViewReserve = ({ setPage }) => {
         })
         .join(", ");
     }
-    if (typeof raw === "string") return raw || "None";
+    if (typeof raw === "string") {
+      const trimmed = raw.trim();
+      // try parse JSON
+      if (
+        (trimmed.startsWith("[") && trimmed.endsWith("]")) ||
+        (trimmed.startsWith("{") && trimmed.endsWith("}"))
+      ) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          return formatSnacks(parsed);
+        } catch (e) {
+          // fallthrough
+        }
+      }
+      return trimmed || "None";
+    }
     if (typeof raw === "object") {
       const name = raw.name ?? raw.snack ?? "Snack";
       const qty = raw.qty ?? raw.quantity ?? 1;
@@ -79,6 +94,59 @@ const ViewReserve = ({ setPage }) => {
       return `${name}${qtyPart}${pricePart}`;
     }
     return String(raw);
+  };
+
+  // Deterministic "random" row from ticketId (stable across renders)
+  const deterministicRow = (ticketId) => {
+    if (!ticketId) return Math.floor(Math.random() * 20) + 1;
+    let sum = 0;
+    for (let i = 0; i < ticketId.length; i++) sum += ticketId.charCodeAt(i);
+    return (sum % 20) + 1;
+  };
+
+  // Parse time string like "18:30" or "6:30 PM" to Date object (today's date)
+  const parseTimeToDate = (timeStr) => {
+    const today = new Date();
+    // if timeStr contains AM/PM
+    if (typeof timeStr === "string" && /am|pm/i.test(timeStr)) {
+      const t = timeStr.trim();
+      const parsed = new Date(`${today.toDateString()} ${t}`);
+      if (!isNaN(parsed)) return parsed;
+    }
+    // assume HH:mm 24h
+    if (typeof timeStr === "string" && timeStr.includes(":")) {
+      const [hh, mm] = timeStr.split(":").map((x) => parseInt(x, 10));
+      if (!isNaN(hh)) {
+        const d = new Date(today);
+        d.setHours(hh, isNaN(mm) ? 0 : mm, 0, 0);
+        return d;
+      }
+    }
+    // fallback to 18:00
+    const d = new Date(today);
+    d.setHours(18, 0, 0, 0);
+    return d;
+  };
+
+  // Format Date object to 12h string "6:30 PM"
+  const format12h = (d) => {
+    if (!(d instanceof Date) || isNaN(d)) return "";
+    let hours = d.getHours();
+    const minutes = d.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${ampm}`;
+  };
+
+  // Given start time string, return "start — end" with end = start +2h and min end 18:00
+  const computeTimeRange = (startStr) => {
+    const startDate = parseTimeToDate(startStr || "18:00");
+    let endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+    // ensure end is at least 18:00 (6pm) on same day
+    const minEnd = new Date(startDate);
+    minEnd.setHours(18, 0, 0, 0);
+    if (endDate < minEnd) endDate = minEnd;
+    return `${format12h(startDate)} — ${format12h(endDate)}`;
   };
 
   // ------------------ Fetch reservations ------------------
@@ -128,6 +196,7 @@ const ViewReserve = ({ setPage }) => {
     }
   };
 
+  // ------------------ Load reservations ------------------
   useEffect(() => {
     fetchReservations();
   }, [fetchReservations]);
@@ -158,105 +227,96 @@ const ViewReserve = ({ setPage }) => {
     .sort((a, b) => reservationDateOnly(b) - reservationDateOnly(a));
 
   // ------------------ Render card ------------------
-  const renderReservationCard = (reservation, isPast = false) => {
-    const row = reservation.row;
-    return (
+  const renderReservationCard = (reservation, isPast = false) => (
+    <div
+      key={reservation.id}
+      className={`bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition flex w-full h-52 md:h-auto md:flex-col relative ${
+        isPast ? "bg-gray-50" : ""
+      }`}
+    >
+      {isPast && (
+        <div className="absolute top-2 right-2 bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded z-10">
+          Expired
+        </div>
+      )}
+
+      {/* QR column */}
       <div
-        key={reservation.id}
-        className={`bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition flex w-full h-52 md:h-auto md:flex-col relative ${
-          isPast ? "bg-gray-50" : ""
+        className={`flex flex-col items-center justify-center w-28 h-full bg-gray-100 md:w-full md:h-48 ${
+          isPast ? "opacity-40" : "cursor-pointer"
+        }`}
+        onClick={() =>
+          !isPast && setQrModal({ visible: true, data: reservation })
+        }
+      >
+        <QRCodeCanvas
+          value={JSON.stringify(reservation)}
+          size={95}
+          level="H"
+          includeMargin={true}
+        />
+        <p className="mt-1 text-xs text-gray-700 hidden md:block">
+          Ticket ID: {reservation.ticketId}
+        </p>
+      </div>
+
+      {/* Info */}
+      <div
+        className={`flex flex-col justify-between px-3 py-2 md:p-4 flex-grow ${
+          isPast ? "text-gray-500" : "text-black"
         }`}
       >
-        {isPast && (
-          <div className="absolute top-2 right-2 bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded z-10">
-            Expired
-          </div>
-        )}
-
-        {/* QR */}
-        <div
-          className={`flex flex-col items-center justify-center w-28 h-full bg-gray-100 md:w-full md:h-48 ${
-            isPast ? "opacity-40" : "cursor-pointer"
+        <h3
+          className={`text-base md:text-lg font-bold mb-1 ${
+            isPast ? "text-gray-600" : "text-black"
           }`}
-          onClick={() =>
-            !isPast && setQrModal({ visible: true, data: reservation })
-          }
         >
-          <QRCodeCanvas
-            value={JSON.stringify(reservation)}
-            size={95}
-            level="H"
-            includeMargin={true}
-          />
-          <p className="mt-1 text-xs text-gray-700 hidden md:block">
-            Ticket ID: {reservation.ticketId}
-          </p>
+          {reservation.selectedMovie}
+        </h3>
+
+        <p className="text-xs md:text-sm">
+          <strong>Date:</strong> {formatDate(reservation.selectedDate)} •{" "}
+          <strong>Time:</strong> {reservation.selectedTime || "N/A"}
+        </p>
+
+        <p className="text-xs md:text-sm">
+          <strong>Room:</strong> {reservation.room} — <strong>Seats:</strong>{" "}
+          {Array.isArray(reservation.selectedSeats)
+            ? reservation.selectedSeats.join(", ")
+            : reservation.selectedSeats || "-"}
+        </p>
+
+        <p className="text-xs md:text-sm">
+          <strong>Snacks:</strong>{" "}
+          {formatSnacks(
+            reservation.snacks ?? reservation.selectedFood ?? reservation.food
+          )}
+        </p>
+
+        <div className="mt-2 bg-gray-100 rounded-lg px-2 py-1 w-fit text-sm font-semibold">
+          <strong>Total:</strong>{" "}
+          {Number(
+            reservation.totalPrice ||
+              reservation.total ||
+              reservation.price ||
+              0
+          ).toFixed(2)}{" "}
+          €
         </div>
 
-        {/* Info */}
-        <div
-          className={`flex flex-col justify-between px-3 py-2 md:p-4 flex-grow ${
-            isPast ? "text-gray-500" : "text-black"
-          }`}
-        >
-          <h3
-            className={`text-base md:text-lg font-bold mb-1 ${
-              isPast ? "text-gray-600" : "text-black"
-            }`}
+        {!isPast && activeTab === "upcoming" && (
+          <button
+            onClick={() => handleFirstConfirm(reservation.id)}
+            className="mt-3 w-full text-[11px] md:text-sm rounded-full border border-red-300 text-red-600 hover:bg-red-50 py-1.5 transition"
           >
-            {reservation.selectedMovie}
-          </h3>
-
-          <p className="text-xs md:text-sm">
-            <strong>Date:</strong> {formatDate(reservation.selectedDate)} •{" "}
-            <strong>Time:</strong> {reservation.selectedTime || "N/A"}
-          </p>
-
-          <p className="text-xs md:text-sm">
-            <strong>Room:</strong> {reservation.room} — <strong>Seats:</strong>{" "}
-            {Array.isArray(reservation.selectedSeats)
-              ? reservation.selectedSeats.join(", ")
-              : reservation.selectedSeats || "-"}
-          </p>
-
-          {row && (
-            <p className="text-xs md:text-sm">
-              <strong>Row:</strong> {row}
-            </p>
-          )}
-
-          <p className="text-xs md:text-sm">
-            <strong>Snacks:</strong>{" "}
-            {formatSnacks(
-              reservation.snacks ?? reservation.selectedFood ?? reservation.food
-            )}
-          </p>
-
-          <div className="mt-2 bg-gray-100 rounded-lg px-2 py-1 w-fit text-sm font-semibold">
-            <strong>Payed:</strong>{" "}
-            {Number(
-              reservation.totalPrice ||
-                reservation.total ||
-                reservation.price ||
-                0
-            ).toFixed(2)}{" "}
-            €
-          </div>
-
-          {!isPast && activeTab === "upcoming" && (
-            <button
-              onClick={() => handleFirstConfirm(reservation.id)}
-              className="mt-3 w-full text-[11px] md:text-sm rounded-full border border-red-300 text-red-600 hover:bg-red-50 py-1.5 transition"
-            >
-              Cancel reservation
-            </button>
-          )}
-        </div>
+            Cancel reservation
+          </button>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
 
-  // ------------------ Render principal ------------------
+  // ------------------ Main render ------------------
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-black px-6 md:px-12 py-10">
       <h1 className="text-3xl font-bold mb-6">My Bookings</h1>
@@ -281,7 +341,7 @@ const ViewReserve = ({ setPage }) => {
         ))}
       </div>
 
-      {/* Listado */}
+      {/* Reservations list */}
       {activeTab === "upcoming" ? (
         upcomingReservations.length ? (
           <div className="flex flex-col gap-4 md:grid md:grid-cols-3 xl:grid-cols-4 md:gap-6">
@@ -302,102 +362,99 @@ const ViewReserve = ({ setPage }) => {
         </p>
       )}
 
-      {/* MODAL QR MEJORADO */}
+      {/* -------- MODAL QR -------- */}
       {qrModal.visible && (
         <div className="fixed inset-0 z-50 bg-white flex flex-col overflow-auto">
-          {/* Cerrar */}
+          {/* Close */}
           <button
             onClick={() => setQrModal({ visible: false, data: null })}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-3xl font-bold"
+            className="absolute top-4 right-4 text-gray-600 hover:text-black text-3xl font-bold"
           >
             &times;
           </button>
 
-          <div className="flex flex-col items-center mt-16 px-6 pb-12">
-            <div className="bg-gray-100 rounded-2xl p-4 shadow-inner">
-              <QRCodeCanvas
-                value={JSON.stringify(qrModal.data)}
-                size={200}
-                level="H"
-                includeMargin={true}
-              />
-            </div>
-        
-            <div className="bg-gray-200 text-center py-2 px-6 rounded-full mt-6 mb-6 shadow-sm">
-              <span className="text-sm font-medium text-gray-800">
-                {formatDate(qrModal.data.selectedDate)} •{" "}
-                {qrModal.data.selectedTime}
+          {/* Content */}
+          <div className="flex flex-col items-center mt-16 px-6 pb-12 w-full">
+            {/* QR */}
+            <QRCodeCanvas
+              value={JSON.stringify(qrModal.data)}
+              size={200}
+              level="H"
+              includeMargin={true}
+            />
+            <p className="mt-2 text-gray-500 text-xs font-mono">
+              ID: {qrModal.data?.ticketId ?? "-"}
+            </p>
+
+            {/* Time bar */}
+            <div className="bg-gray-800 text-white text-center py-2 px-6 rounded-full mt-5 mb-6 shadow-sm w-fit">
+              <span className="text-sm font-medium">
+                {computeTimeRange(qrModal.data?.selectedTime)}
               </span>
             </div>
 
             {/* Ticket */}
-            <div className="relative w-full max-w-md rounded-2xl shadow-lg bg-gradient-to-b from-gray-50 to-gray-100 border border-gray-300 overflow-hidden">
-              <div className="absolute left-0 right-0 top-1/2 h-[2px] bg-gray-200 border-dashed border-t border-gray-400 opacity-60"></div>
-
-              <div className="px-6 py-4 border-b border-gray-300 text-center">
-                <h2 className="text-lg font-bold text-gray-800">
-                  {qrModal.data.selectedMovie}
-                </h2>
+            <div className="w-full max-w-md bg-gray-900 text-white rounded-xl overflow-hidden shadow-lg">
+              {/* Movie title */}
+              <div className="px-6 py-4 border-b border-gray-700">
+                <span className="text-lg font-semibold">
+                  {qrModal.data?.selectedMovie ?? "-"}
+                </span>
               </div>
 
-              <div className="divide-y divide-gray-300 text-sm">
-                <div className="flex justify-between px-6 py-3 bg-white">
-                  <span className="font-semibold text-gray-500">ROOM</span>
-                  <span className="text-gray-800">{qrModal.data.room}</span>
-                </div>
-
-                <div className="flex justify-between px-6 py-3 bg-gray-50">
-                  <span className="font-semibold text-gray-500">ROW</span>
-                  <span className="text-gray-800">
-                    {qrModal.data.row || "-"}
+              {/* Row + Seats + Room */}
+              <div className="flex justify-between px-6 py-4 border-b border-gray-700">
+                <div className="flex flex-col">
+                  <span className="text-sm uppercase text-gray-400">Row</span>
+                  <span className="text-2xl font-bold">
+                    {qrModal.data?.row ??
+                      deterministicRow(qrModal.data?.ticketId ?? "")}
                   </span>
                 </div>
-
-                <div className="flex justify-between px-6 py-3 bg-white">
-                  <span className="font-semibold text-gray-500">SEATS</span>
-                  <span className="text-gray-800">
-                    {Array.isArray(qrModal.data.selectedSeats)
+                <div className="flex flex-col">
+                  <span className="text-sm uppercase text-gray-400">Seats</span>
+                  <span className="text-2xl font-bold">
+                    {Array.isArray(qrModal.data?.selectedSeats)
                       ? qrModal.data.selectedSeats.join(", ")
-                      : qrModal.data.selectedSeats || "-"}
+                      : qrModal.data?.selectedSeats ?? "-"}
                   </span>
                 </div>
-
-                <div className="flex justify-between px-6 py-3 bg-gray-50">
-                  <span className="font-semibold text-gray-500">SNACKS</span>
-                  <span className="text-gray-800 text-right">
-                    {formatSnacks(
-                      qrModal.data.snacks ??
-                        qrModal.data.selectedFood ??
-                        qrModal.data.food
-                    )}
-                  </span>
-                </div>
-
-                <div className="flex justify-between px-6 py-3 bg-white">
-                  <span className="font-semibold text-gray-500">TOTAL</span>
-                  <span className="font-bold text-gray-900">
-                    {Number(
-                      qrModal.data.totalPrice || qrModal.data.total || 0
-                    ).toFixed(2)}{" "}
-                    €
+                <div className="flex flex-col items-end">
+                  <span className="text-sm uppercase text-gray-400">Room</span>
+                  <span className="text-2xl font-bold">
+                    {qrModal.data?.room ?? "-"}
                   </span>
                 </div>
               </div>
 
-              <div className="bg-gray-200 text-center py-3">
-                <p className="text-xs text-gray-700 tracking-wide">
-                  ID:{" "}
-                  <span className="font-semibold text-gray-900">
-                    {qrModal.data.ticketId}
-                  </span>
-                </p>
+              {/* Snacks */}
+              <div className="flex justify-between px-6 py-3 border-b border-gray-700 text-sm">
+                <span>Snacks</span>
+                <span className="text-right">
+                  {formatSnacks(
+                    qrModal.data?.snacks ??
+                      qrModal.data?.selectedFood ??
+                      qrModal.data?.food
+                  )}
+                </span>
+              </div>
+
+              {/* Payed */}
+              <div className="flex justify-between px-6 py-4 text-lg font-bold">
+                <span>Payed</span>
+                <span>
+                  {Number(
+                    qrModal.data?.totalPrice ?? qrModal.data?.total ?? 0
+                  ).toFixed(2)}{" "}
+                  €
+                </span>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Confirmaciones */}
+      {/* -------- CONFIRMATION MODALS -------- */}
       {confirmModal.visible && confirmModal.step === 1 && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full">
@@ -450,16 +507,22 @@ const ViewReserve = ({ setPage }) => {
                   <p>
                     <strong>Room:</strong> {res.room}
                   </p>
-                  {res.row && (
-                    <p>
-                      <strong>Row:</strong> {res.row}
-                    </p>
-                  )}
                   <p>
                     <strong>Seats:</strong>{" "}
                     {Array.isArray(res.selectedSeats)
                       ? res.selectedSeats.join(", ")
                       : res.selectedSeats || "-"}
+                  </p>
+                  <p>
+                    <strong>Snacks:</strong>{" "}
+                    {formatSnacks(res.snacks ?? res.selectedFood ?? res.food)}
+                  </p>
+                  <p>
+                    <strong>Payed:</strong>{" "}
+                    {Number(res.totalPrice || res.total || 0).toFixed(2)} €
+                  </p>
+                  <p>
+                    <strong>Ticket ID:</strong> {res.ticketId}
                   </p>
                 </div>
               ))}
@@ -476,7 +539,7 @@ const ViewReserve = ({ setPage }) => {
                 onClick={confirmCancel}
                 className="px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-700"
               >
-                Confirm cancel
+                Confirm Cancel
               </button>
             </div>
           </div>

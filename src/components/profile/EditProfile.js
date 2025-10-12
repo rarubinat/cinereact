@@ -32,7 +32,7 @@ const EditProfile = () => {
     useState(false);
 
   const { notify } = useNotification(); // custom notify function
-  const { totalCount, last30DaysCount, totalPoints } = useReservationCount(); // reservation stats
+  const { totalCount, totalPoints } = useReservationCount(); // reservation stats
   const navigate = useNavigate(); // navigation hook
 
   // Fetch user profile and reservations on auth state change

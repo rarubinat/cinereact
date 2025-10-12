@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import moviesData from "../../data/moviesData";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,10 +22,6 @@ const Home = () => {
     ([, data]) => data.category === "NOW_SHOWING"
   );
 
-  // State for future carousel functionality (optional)
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const slidesToShow = 4;
-  const maxIndex = nowPlaying.length - slidesToShow;
 
   // Navigate to movie detail page when a movie card is clicked
   const handleNavigate = (title) => {

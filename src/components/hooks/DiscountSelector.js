@@ -1,40 +1,23 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-/**
- * ApplyOffers component
- * Displays available discounts and allows the user to select one.
- * Explains logic inline for developers.
- *
- * Props:
- * - selectedDate: string, the date of the movie (YYYY-MM-DD)
- * - selectedSeats: array, list of selected seat numbers
- * - onSelectDiscount: function, callback to inform parent when a discount is selected
- */
-const ApplyOffers = ({ selectedDate, selectedSeats, onSelectDiscount }) => {
-  // ----------------- Fixed discounts -----------------
-  // These discounts are always available
+const ApplyOffers = ({ selectedDate, onSelectDiscount }) => {
   const fixedDiscounts = [
-    { id: "d1", name: "10% Off", value: 0.1 },
-    { id: "d2", name: "20% Off", value: 0.2 },
-    { id: "d3", name: "Student 15% Off", value: 0.15 },
+    { id: "d1", name: "10% Off", value: 0.1, available: true },
+    { id: "d2", name: "20% Off", value: 0.2, available: true },
+    { id: "d3", name: "Student 15% Off", value: 0.15, available: true },
   ];
 
-  // ----------------- Component state -----------------
-  const [availableDiscounts, setAvailableDiscounts] = useState([]); // Discounts shown to user
-  const [selectedDiscount, setSelectedDiscount] = useState(null); // Currently selected discount
+  const [availableDiscounts, setAvailableDiscounts] = useState([]);
+  const [selectedDiscount, setSelectedDiscount] = useState(null);
 
-  // ----------------- Conditional discounts -----------------
-  // Hardcoded birthday for demonstration; in real app, pass from user profile
   const userBirthday = "1995-08-20";
 
-  // ----------------- Compute discounts whenever selectedDate changes -----------------
   useEffect(() => {
     const today = new Date();
     const movieDay = new Date(selectedDate);
+    const extraDiscounts = [];
 
-    let extraDiscounts = [];
-
-    // Birthday discount: free ticket if today is user's birthday
     const birthdayDate = new Date(userBirthday);
     const isBirthdayToday =
       today.getDate() === birthdayDate.getDate() &&
@@ -43,66 +26,84 @@ const ApplyOffers = ({ selectedDate, selectedSeats, onSelectDiscount }) => {
     extraDiscounts.push({
       id: "bday",
       name: "Birthday Free Ticket",
-      value: 1, // full discount
+      value: 1,
       available: isBirthdayToday,
     });
 
-    // 2x1 Tuesday: applies if movie is on Tuesday
-    if (movieDay.getDay() === 2) {
-      extraDiscounts.push({
-        id: "tue",
-        name: "2x1 Tuesday",
-        value: 0.5,
-        available: true,
-      });
-    }
+    extraDiscounts.push({
+      id: "tue",
+      name: "2x1 Tuesday",
+      value: 0.5,
+      available: movieDay.getDay() === 2,
+    });
 
-    // Merge fixed discounts with conditional ones
     setAvailableDiscounts([...fixedDiscounts, ...extraDiscounts]);
   }, [selectedDate]);
 
-  // ----------------- Handle user selecting a discount -----------------
   const handleSelect = (discount) => {
-    if (!discount.available) return; // Prevent selecting unavailable discounts
+    if (!discount.available) return;
     setSelectedDiscount(discount);
-    onSelectDiscount(discount); // Notify parent component of selection
+    onSelectDiscount(discount);
   };
 
-  // ----------------- Render -----------------
   return (
-    <div className="mt-6">
-      <h3 className="text-lg font-semibold mb-3">Available Discounts</h3>
+    <div className="mt-8">
+      <h3 className="text-xl font-semibold mb-4 text-gray-900">
+        Available Discounts
+      </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {availableDiscounts.map((discount) => {
           const isSelected = selectedDiscount?.id === discount.id;
           const disabled = !discount.available;
 
           return (
-            <div
+            <motion.div
               key={discount.id}
+              whileHover={!disabled ? { scale: 1.03 } : {}}
+              transition={{ duration: 0.2 }}
               onClick={() => !disabled && handleSelect(discount)}
-              className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center transition shadow-sm
-                ${isSelected ? "border-black ring-2 ring-black" : "border-gray-300 hover:border-black"}
-                ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
+              className={`relative border rounded-2xl p-5 shadow-sm flex flex-col justify-between transition cursor-pointer
+                ${isSelected ? "border-black ring-2 ring-black" : "border-gray-200 hover:border-black/60"}
+                ${disabled ? "opacity-40 cursor-not-allowed bg-gray-50" : "bg-white"}`}
             >
-              {/* Discount title */}
-              <p className="text-lg font-bold">{discount.name}</p>
+              {/* Header section */}
+              <div>
+                <h4 className="text-lg font-bold text-gray-900">{discount.name}</h4>
+                <p className="text-sm text-gray-500 mt-1">
+                  {discount.id === "bday"
+                    ? "1 Free Ticket"
+                    : discount.id === "tue"
+                    ? "2x1 Tuesday"
+                    : `${discount.value * 100}% Off`}
+                </p>
+              </div>
 
-              {/* Discount description */}
-              <p className="text-sm text-gray-500">
-                {discount.id === "bday"
-                  ? "1 Free Ticket" // Birthday discount
-                  : discount.id === "tue"
-                  ? "2x1 Tuesday" // Tuesday discount
-                  : `${discount.value * 100}% off`} // Fixed discount
-              </p>
+              {/* Radio circle */}
+              <div className="flex justify-end mt-4">
+                <div
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all 
+                    ${isSelected ? "border-black" : "border-gray-300"} 
+                    ${disabled ? "border-gray-300" : "hover:border-black"}`}
+                >
+                  {isSelected && (
+                    <motion.div
+                      layoutId="selectedIndicator"
+                      className="w-3 h-3 bg-black rounded-full"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                </div>
+              </div>
 
-              {/* Show selected state */}
-              {isSelected && !disabled && (
-                <span className="mt-2 text-green-600 font-semibold">✔ Selected</span>
+              {/* Disabled label */}
+              {disabled && (
+                <span className="absolute top-2 right-3 text-[11px] text-gray-400 italic">
+                  Not available
+                </span>
               )}
-            </div>
+            </motion.div>
           );
         })}
       </div>

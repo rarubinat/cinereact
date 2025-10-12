@@ -58,8 +58,10 @@ const contests = [
 ];
 
 // Export default object containing all promotion categories for easy import
-export default {
+const promotions = {
   generalPromotions,
   moviePromotions,
   contests,
 };
+
+export default promotions;
