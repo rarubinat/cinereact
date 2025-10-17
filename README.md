@@ -15,10 +15,7 @@ A sleek, responsive **React-based cinema booking system** that allows users to s
 ## 🚀 Features
 
 - ✅ **Real-time seat availability** per movie & time
-- 🎨 Visual seat states:
-  - 🟦 Selected (blue)
-  - 🟥 Occupied (red)
-  - ⬜ Available (grey)
+- 🎨 Visual seat states (Selected, Occupied, Available)
 - 🎥 Multiple movies & schedules support
 - 📱 Fully responsive UI with modern styling (TailwindCSS)
 - 🎟 Ticket QR code generation
@@ -38,7 +35,7 @@ The app follows a multi-step booking flow managed through a global BookingContex
 A responsive ProgressBar visually guides users through each step, ensuring clarity and consistency across the booking journey.
 
 - 👤 Profile management:
-  - Edit personal info (name, phone, birthdate, gender, payment method)
+  - Edit personal info (name, phone, birthdate, gender)
   - Toggle notifications & preferred language
   - Displays next reservation, total reservations, and loyalty points
 
